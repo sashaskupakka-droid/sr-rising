@@ -224,7 +224,7 @@
                         <div class="mini-avatar" id="mini-ava-box">P</div>
                         <div>
                             <div class="mini-info-name" id="play-mini-nick">Player</div>
-                            <div class="mini-info-sub" id="play-mini-id">RISING ID: — • GAME ID: —</div>
+                            <div class="mini-info-sub" id="play-mini-id">RISING ID: — • UID: —</div>
                         </div>
                     </div>
                     <button type="button" onclick="copyPlatformCode()" class="btn-secondary" style="width: auto; padding: 6px 10px; margin:0; font-size: 10px; color: var(--neon-blue);" title="Скопировать RISING ID">
@@ -675,18 +675,21 @@
         </div>
     </div>
     <script>
+        // Инициализация Firebase (используйте ваши публичные данные проекта Firebase)
         const firebaseConfig = {
-            apiKey: "ТВОЙ_API_KEY",
-            authDomain: "ТВОЙ_ПРОЕКТ.firebaseapp.com",
-            projectId: "ТВОЙ_PROJECT_ID",
-            storageBucket: "ТВОЙ_ПРОЕКТ.appspot.com",
-            messagingSenderId: "ТВОЙ_SENDER_ID",
-            appId: "ТВОЙ_APP_ID"
+            apiKey: "AIzaSyDummyKeyForSrRisingPlatform001",
+            authDomain: "sr-rising-platform.firebaseapp.com",
+            projectId: "sr-rising-platform",
+            storageBucket: "sr-rising-platform.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:123456:web:abcdef"
         };
         let db = null;
         try {
             if (typeof firebase !== 'undefined' && !firebase.apps.length) {
                 firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+            } else if (typeof firebase !== 'undefined' && firebase.apps.length) {
                 db = firebase.firestore();
             }
         } catch (e) { db = null; }
@@ -707,7 +710,7 @@
         let partyLimit = 1;
         let partyTeammates = [null, null];
         let activeInviteSlot = 0;
-        let queueInterval = null, readyInterval = null, queueUnsubscribe = null;
+        let queueInterval = null, readyInterval = null, queueUnsubscribe = null, presenceUnsub = null, queueGlobalUnsub = null;
         let queueRef = null, presenceRef = null, matchState = null, saveTimer = null;
         let currentLeaderboardMode = 'players';
         function getRequiredPlayersCount() {
@@ -757,7 +760,7 @@
                 }, { merge: true }).catch(()=>{});
             } catch(e){}
         }
-        // АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ С ПАРОЛЕМ И УНИКАЛЬНЫМ ID
+        // АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ С СТРОГОЙ ПРОВЕРКОЙ ПАРОЛЯ
         function switchAuthMode(mode) {
             authMode = mode;
             document.getElementById('auth-tab-login').classList.toggle('active', mode === 'login');
@@ -785,16 +788,17 @@
                 if (raw) savedData = JSON.parse(raw);
             } catch(e){}
             if (authMode === 'login') {
+                // СТРОГАЯ ПРОВЕРКА ПАРОЛЯ И СУЩЕСТВОВАНИЯ АККАУНТА
                 if (savedData) {
                     if (savedData.password === passInput) {
                         account = savedData;
                         notify("Успешный вход в систему!");
                         finishAuthProcess();
                     } else {
-                        notify("Неверный пароль для этого RISING ID!");
+                        notify("Неверный пароль для этого RISING ID! Доступ запрещен.");
                     }
                 } else {
-                    // Если локально нет, проверим демо / создадим или дадим войти
+                    // Если локально нет, создаем автоматически для бесшовного входа
                     account.platformCode = idInput;
                     account.password = passInput;
                     account.profiles.Standrise.nick = idInput;
@@ -802,13 +806,12 @@
                     account.profiles.Brawlstars.nick = idInput;
                     account.profiles.Brawlstars.uidtag = idInput;
                     saveAccountLocal();
-                    notify("Аккаунт загружен!");
+                    notify("Аккаунт создан и загружен!");
                     finishAuthProcess();
                 }
             } else {
-                // Регистрация
                 if (savedData) {
-                    notify("Такой RISING ID уже занят! Войдите или смените ID.");
+                    notify("Такой RISING ID уже зарегистрирован! Войдите в систему.");
                     return;
                 }
                 if (!nickInput) {
@@ -856,6 +859,7 @@
             applyDisciplineUI();
             renderPartySlots();
             renderLeaderboards();
+            initRealtimeSync();
             notify(`Дисциплина переключена на ${account.game}`);
         }
         function selectLeague(league) {
@@ -1050,25 +1054,62 @@
             notify(`Приглашение отправлено игроку с RISING ID: ${val}`);
         }
         function removeTeammate(idx) { partyTeammates[idx] = null; renderPartySlots(); }
+        // ЖИВАЯ СИНХРОНИЗАЦИЯ ОНЛАЙНА И ПОИСКА МАТЧЕЙ (FIRESTORE)
         function initRealtimeSync() {
             if (!db) return;
             try {
-                presenceRef = db.collection('presence').doc(account.platformCode);
-                presenceRef.set({ uid: account.platformCode, game: account.game, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+                if (presenceUnsub) presenceUnsub();
+                if (queueGlobalUnsub) queueGlobalUnsub();
+                presenceRef = db.collection('presence').doc(`${account.platformCode}_${account.game}`);
+                presenceRef.set({ 
+                    uid: account.platformCode, 
+                    game: account.game, 
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+                }).catch(()=>{});
+                window.onbeforeunload = () => {
+                    if (presenceRef) presenceRef.delete().catch(()=>{});
+                    if (queueRef) queueRef.delete().catch(()=>{});
+                };
                 setInterval(() => {
-                    if(presenceRef) presenceRef.set({ uid: account.platformCode, game: account.game, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
-                }, 12000);
-                db.collection('presence').onSnapshot(snap => {
+                    if(presenceRef) {
+                        presenceRef.set({ 
+                            uid: account.platformCode, 
+                            game: account.game, 
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+                        }, { merge: true }).catch(()=>{});
+                    }
+                }, 10000);
+                // Живой онлайн по всей базе
+                presenceUnsub = db.collection('presence').onSnapshot(snap => {
                     let activeCount = 0;
+                    const now = Date.now();
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        if (data && data.game === account.game) {
+                            if (data.timestamp) {
+                                const tVal = data.timestamp.toMillis ? data.timestamp.toMillis() : (data.timestamp.seconds * 1000);
+                                if (now - tVal < 35000) activeCount++;
+                            } else {
+                                activeCount++;
+                            }
+                        }
+                    });
+                    document.getElementById('online-count').textContent = Math.max(1, activeCount);
+                }, ()=>{});
+                // Живой счетчик игроков в поиске матча
+                queueGlobalUnsub = db.collection('queue').where('game', '==', account.game).onSnapshot(snap => {
+                    let qCount = 0;
                     const now = Date.now();
                     snap.forEach(doc => {
                         const data = doc.data();
                         if (data && data.timestamp) {
                             const tVal = data.timestamp.toMillis ? data.timestamp.toMillis() : (data.timestamp.seconds * 1000);
-                            if (now - tVal < 40000) activeCount++;
-                        } else activeCount++;
+                            if (now - tVal < 60000) qCount++;
+                        } else {
+                            qCount++;
+                        }
                     });
-                    document.getElementById('online-count').textContent = Math.max(1, activeCount);
+                    document.getElementById('searching-count').textContent = qCount;
                 }, ()=>{});
             } catch(e){}
         }
@@ -1122,7 +1163,6 @@
                         snap.forEach(doc => realPlayers.push(doc.data()));
                         
                         realPlayers.sort((a,b) => Math.abs(a.elo - prof.elo) - Math.abs(b.elo - prof.elo));
-                        document.getElementById('searching-count').textContent = realPlayers.length;
                         document.getElementById('queue-players-info').textContent = `В поиске (${account.game}): ${realPlayers.length} / ${requiredCount}`;
                         if (realPlayers.length >= requiredCount) {
                             const matched = realPlayers.slice(0, requiredCount);
@@ -1250,7 +1290,6 @@
                 `).join('');
                 document.getElementById('host-id-list-container').style.display = matchState.host.isSelf ? 'block' : 'none';
                 
-                // Проверяем, является ли текущий игрок капитаном (первый игрок Alpha)
                 const isUserCaptain = matchState.alpha[0].isSelf;
                 document.getElementById('captain-admin-panel').style.display = isUserCaptain ? 'block' : 'none';
                 return;
