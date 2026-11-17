@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SR RISING — Global Esports Platform (Ultimate Edition)</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@700;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Firebase SDK Compat Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <style>
+        :root {
+            --bg-deep: #030508;
+            --bg-card: #080c16;
+            --bg-panel: #0d1322;
+            --bg-panel-hover: #151e33;
+            --accent: #ff4655;
+            --accent-dim: rgba(255, 70, 85, 0.15);
+            --amber-gold: #ffaa00;
+            --neon-blue: #00f0ff;
+            --text-main: #f3f6f9;
+            --text-muted: #64748b;
+            --border: #162035;
+            --border-active: #2e4168;
+            --success: #00ff66;
+            --danger: #ff3333;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; user-select: none; }
+        input, select { user-select: text; -webkit-user-select: text; }
+        body { background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+        .font-display { font-family: 'Rajdhani', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .setup-screen { position: fixed; inset: 0; z-index: 200; background: var(--bg-deep); display: flex; align-items: center; justify-content: center; padding: 20px; overflow-y: auto; }
+        .auth-container { width: 100%; max-width: 420px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 32px 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+        .input-field { width: 100%; background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; padding: 13px 16px; color: #fff; font-size: 14px; outline: none; transition: 0.2s; }
+        .input-field:focus { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-dim); }
+        .btn-primary { width: 100%; padding: 14px; border-radius: 12px; border: none; background: var(--accent); color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 17px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; transition: 0.2s; text-decoration: none; display: inline-block; text-align: center; }
+        .btn-primary:active { opacity: 0.85; transform: scale(0.98); }
+        .btn-secondary { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-panel); color: var(--amber-gold); font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; text-align: center; text-decoration: none; display: block; }
+        .btn-danger { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--danger); background: rgba(255,51,51,0.1); color: var(--danger); font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; text-align: center; }
+        .btn-plain { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border-active); background: var(--bg-panel-hover); color: #ffffff; font-size: 16px; font-weight: 700; cursor: pointer; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
+        .selection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
+        .select-card { background: var(--bg-deep); border: 2px solid var(--border); border-radius: 14px; padding: 22px 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .select-card.active { border-color: var(--accent); background: var(--accent-dim); }
+        .select-card-title { font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 900; margin-top: 8px; }
+        #app-shell { display: none; flex-direction: column; min-height: 100vh; padding-bottom: 90px; }
+        header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+        .brand { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 18px; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+        .brand span { color: var(--accent); }
+        .header-right { display: flex; align-items: center; gap: 8px; }
+        .game-switch-pill { font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 8px; background: var(--bg-panel); border: 1px solid var(--border-active); color: var(--neon-blue); cursor: pointer; text-transform: uppercase; display: flex; align-items: center; gap: 6px; }
+        .header-user { display: flex; align-items: center; gap: 8px; background: var(--bg-panel); padding: 5px 10px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; }
+        .lvl-badge { width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--amber-gold); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 10px; color: var(--amber-gold); }
+        main { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 16px; }
+        .view { display: none; }
+        .view.active { display: block; }
+        .user-mini-banner {
+            background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 14px;
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; position: relative; overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .user-mini-bg { position: absolute; inset: 0; opacity: 0.18; background-size: cover; background-position: center; pointer-events: none; }
+        .user-mini-left { display: flex; align-items: center; gap: 12px; position: relative; z-index: 2; }
+        .mini-avatar { width: 50px; height: 50px; border-radius: 14px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #fff; border: 2px solid var(--border-active); }
+        .mini-info-name { font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 900; color: #fff; }
+        .mini-info-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
+        .elo-widget { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .elo-widget-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .elo-lvl-circle { width: 52px; height: 52px; border-radius: 50%; border: 3px solid var(--amber-gold); display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(255,170,0,0.1); font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 18px; color: var(--amber-gold); }
+        .elo-num-val { font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+        .elo-tag-badge { background: var(--accent-dim); border: 1px solid var(--accent); color: var(--accent); font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 6px; text-transform: uppercase; font-family: 'Orbitron', sans-serif; }
+        .elo-bar-bg { width: 100%; height: 6px; background: var(--bg-deep); border-radius: 3px; overflow: hidden; margin-bottom: 8px; border: 1px solid var(--border); }
+        .elo-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: 0.4s; }
+        .elo-bar-footer { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+        .live-counters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .counter-box { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .counter-label { color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .counter-val { font-family: 'Orbitron', sans-serif; font-weight: 900; color: #fff; }
+        .dot-online { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); display: inline-block; }
+        .dot-search { width: 8px; height: 8px; border-radius: 50%; background: var(--amber-gold); box-shadow: 0 0 8px var(--amber-gold); display: inline-block; }
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+        .stat-box { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; }
+        .stat-val { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 900; color: #fff; margin-top: 4px; }
+        .stat-lbl { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 20px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .card-title { font-family: 'Rajdhani', sans-serif; font-size: 18px; font-weight: 700; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; letter-spacing: 0.5px; }
+        .league-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+        .league-card { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; padding: 12px 6px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .league-card.active { border-color: var(--neon-blue); background: rgba(0,240,255,0.08); }
+        .league-card.locked { opacity: 0.5; border-style: dashed; }
+        .league-card-title { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 900; color: #fff; }
+        .league-card-sub { font-size: 9px; color: var(--text-muted); text-transform: uppercase; margin-top: 3px; }
+        .party-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+        .party-btn { background: var(--bg-deep); border: 2px solid var(--border); border-radius: 12px; padding: 10px; color: var(--text-muted); font-weight: 700; font-size: 13px; cursor: pointer; text-align: center; }
+        .party-btn.active { border-color: var(--accent); color: #fff; background: var(--accent-dim); }
+        .party-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0 16px 0; }
+        .party-slot { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+        .slot-avatar { width: 44px; height: 44px; border-radius: 10px; background: var(--bg-panel); border: 2px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--accent); cursor: pointer; }
+        .slot-avatar.filled { border-style: solid; border-color: var(--accent); color: #fff; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; background: var(--accent-dim); }
+        .slot-name { font-size: 11px; font-weight: 700; color: var(--text-main); width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .slot-status { font-size: 9px; color: var(--success); font-weight: 700; text-transform: uppercase; }
+        .shop-section-title { font-size: 14px; font-weight: 700; color: var(--amber-gold); margin: 16px 0 10px 0; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; display: flex; align-items: center; gap: 8px; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 14px; }
+        .shop-card { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; }
+        .srid-copy-banner {
+            background: rgba(0, 240, 255, 0.08); border: 1px dashed var(--neon-blue); border-radius: 12px;
+            padding: 12px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .dev-badge-tag { background: rgba(0,255,102,0.1); border: 1px solid var(--success); color: var(--success); font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 6px; }
+        .ava-frame-preview {
+            width: 70px; height: 70px; border-radius: 16px; margin: 0 auto 12px auto;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--bg-panel); font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #fff;
+        }
+        .ava-frame-cyan { border: 3px solid #00f0ff; box-shadow: 0 0 16px rgba(0, 240, 255, 0.65); }
+        .ava-frame-gold { border: 3px solid #ffaa00; box-shadow: 0 0 16px rgba(255, 170, 0, 0.65); }
+        .ava-frame-crimson { border: 3px solid #ff4655; box-shadow: 0 0 16px rgba(255, 70, 85, 0.65); }
+        .ava-frame-emerald { border: 3px solid #00ff66; box-shadow: 0 0 16px rgba(0, 255, 102, 0.65); }
+        .profile-banner-box {
+            width: 100%; height: 110px; border-radius: 14px; background: linear-gradient(135deg, #0d1322 0%, #1e1233 100%);
+            border: 1px solid var(--border-active); margin-bottom: -32px; position: relative; overflow: hidden;
+            background-size: cover; background-position: center;
+        }
+        .profile-banner-overlay {
+            position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(3,5,8,0.1), rgba(8,12,22,0.92));
+        }
+        .ladder-podium { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 8px; margin-bottom: 16px; align-items: flex-end; }
+        .podium-card { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 14px; padding: 12px 8px; text-align: center; }
+        .podium-card.first { border-color: var(--amber-gold); background: rgba(255,170,0,0.06); padding-bottom: 16px; }
+        .podium-ava { width: 44px; height: 44px; border-radius: 12px; background: var(--bg-panel); margin: 0 auto 8px auto; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; border: 2px solid var(--border); }
+        .podium-card.first .podium-ava { width: 52px; height: 52px; border-color: var(--amber-gold); }
+        .ladder-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+        .ladder-tab-btn { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: var(--text-muted); font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; text-align: center; }
+        .ladder-tab-btn.active { background: var(--accent-dim); border-color: var(--accent); color: #fff; }
+        .ladder-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; }
+        .ladder-table th { text-align: left; padding: 10px 8px; font-size: 11px; text-transform: uppercase; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg-panel); font-family: 'Rajdhani', sans-serif; }
+        .ladder-table td { padding: 11px 8px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .col-rank { width: 38px; text-align: center !important; font-family: 'Orbitron', sans-serif; font-weight: 900; }
+        .col-player { width: auto; }
+        .col-lvl { width: 40px; text-align: center !important; }
+        .col-wr { width: 52px; text-align: center !important; color: var(--success); font-weight: 700; }
+        .col-elo { width: 62px; text-align: right !important; font-family: 'Orbitron', sans-serif; font-weight: 900; color: var(--accent); }
+        .player-cell-nick { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; cursor: pointer; color: var(--neon-blue); }
+        .row-me { background: rgba(255, 70, 85, 0.12); }
+        .veto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 14px; }
+        .map-card { background: var(--bg-deep); border: 2px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .map-card.banned { opacity: 0.25; border-color: var(--danger); cursor: not-allowed; }
+        .map-card-name { font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; }
+        .team-grid { display: grid; grid-template-columns: 1fr; gap: 14px; margin-top: 14px; }
+        @media (min-width: 768px) { .team-grid { grid-template-columns: 1fr 1fr; } }
+        .roster-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: var(--bg-deep); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 8px; font-size: 12px; }
+        .id-copy-box { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; font-size: 12px; }
+        .id-copy-btn { background: var(--bg-panel); border: 1px solid var(--border); color: var(--neon-blue); padding: 5px 10px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 11px; }
+        nav { position: fixed; bottom: 12px; left: 12px; right: 12px; background: rgba(8, 12, 22, 0.92); backdrop-filter: blur(12px); border: 1px solid var(--border); border-radius: 20px; display: flex; justify-content: space-around; padding: 10px 0; z-index: 50; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
+        .nav-btn { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; cursor: pointer; width: 20%; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; }
+        .nav-btn.active { color: var(--accent); }
+        .nav-btn i { font-size: 16px; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(3, 5, 8, 0.95); z-index: 150; align-items: center; justify-content: center; padding: 20px; }
+        .modal-box { width: 100%; max-width: 400px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; padding: 26px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.7); }
+        .toast-wrap { position: fixed; top: 70px; right: 16px; z-index: 300; display: flex; flex-direction: column; gap: 8px; max-width: 300px; pointer-events: none; }
+        .toast { background: var(--bg-panel); border-left: 3px solid var(--accent); border-radius: 10px; padding: 10px 14px; font-size: 12px; font-weight: 600; color: #fff; box-shadow: 0 6px 16px rgba(0,0,0,0.5); }
+    </style>
+</head>
+<body>
+    <div id="toast-wrap" class="toast-wrap"></div>
+    <!-- ЭКРАН 1: АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ С ПАРОЛЕМ И УНИКАЛЬНЫМ ID -->
+    <div id="screen-auth" class="setup-screen">
+        <div class="auth-container">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h1 class="font-cyber" style="font-size: 26px; font-weight: 900;">SR <span style="color: var(--accent);">RISING</span></h1>
+                <p style="font-size: 11px; color: var(--text-muted); margin-top: 6px; text-transform: uppercase;">Авторизованный доступ по Unique ID</p>
+            </div>
+            <div class="ladder-tabs" style="margin-bottom: 20px;">
+                <button type="button" class="ladder-tab-btn active" id="auth-tab-login" onclick="switchAuthMode('login')">Вход</button>
+                <button type="button" class="ladder-tab-btn" id="auth-tab-reg" onclick="switchAuthMode('reg')">Регистрация</button>
+            </div>
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)">
+                <div class="input-group">
+                    <label id="auth-id-label">Ваш уникальный RISING ID *</label>
+                    <input type="text" id="input-auth-id" class="input-field" placeholder="Например: SR-849201" required>
+                </div>
+                <div class="input-group" id="group-auth-pass">
+                    <label>Пароль *</label>
+                    <input type="password" id="input-auth-pass" class="input-field" placeholder="Введите надежный пароль" required>
+                </div>
+                <div class="input-group" id="group-auth-nick" style="display: none;">
+                    <label>Никнейм *</label>
+                    <input type="text" id="input-auth-nick" class="input-field" placeholder="Ваш игровой ник">
+                </div>
+                <button type="submit" id="auth-submit-btn" class="btn-primary" style="margin-top: 8px;">Войти в систему</button>
+            </form>
+        </div>
+    </div>
+    <!-- ОСНОВНОЙ ИГРОВОЙ ИНТЕРФЕЙС -->
+    <div id="app-shell">
+        <header>
+            <div class="brand"><i class="fa-solid fa-bolt" style="color:var(--amber-gold);"></i> SR <span>RISING</span></div>
+            <div class="header-right">
+                <button type="button" class="game-switch-pill" onclick="toggleGameDiscipline()" title="Сменить дисциплину">
+                    <i class="fa-solid fa-gamepad"></i> <span id="hdr-game-name">Standrise</span> <i class="fa-solid fa-rotate"></i>
+                </button>
+                <div class="header-user" onclick="switchView('profile')">
+                    <div style="text-align: right;">
+                        <div id="hdr-nick" style="font-size: 11px; font-weight: 700; line-height: 1.1;">Player</div>
+                        <div id="hdr-elo" style="font-size: 10px; font-weight: 700; color: var(--accent); line-height: 1.1;">0 ELO</div>
+                    </div>
+                    <div class="lvl-badge" id="hdr-lvl">1</div>
+                </div>
+            </div>
+        </header>
+        <main>
+            <!-- ВКЛАДКА 1: ИГРАТЬ -->
+            <section id="view-play" class="view active">
+                <div class="user-mini-banner">
+                    <div class="user-mini-bg" id="mini-banner-bg"></div>
+                    <div class="user-mini-left">
+                        <div class="mini-avatar" id="mini-ava-box">P</div>
+                        <div>
+                            <div class="mini-info-name" id="play-mini-nick">Player</div>
+                            <div class="mini-info-sub" id="play-mini-id">RISING ID: — • GAME ID: —</div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="copyPlatformCode()" class="btn-secondary" style="width: auto; padding: 6px 10px; margin:0; font-size: 10px; color: var(--neon-blue);" title="Скопировать RISING ID">
+                        <i class="fa-solid fa-copy"></i> RISING ID
+                    </button>
+                </div>
+                <div class="elo-widget">
+                    <div class="elo-widget-top">
+                        <div style="display: flex; align-items: center; gap: 14px;">
+                            <div class="elo-lvl-circle" id="widget-lvl-circle">1</div>
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div class="elo-num-val" id="widget-elo-num">0</div>
+                                    <span class="elo-tag-badge">ELO</span>
+                                </div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace;" id="widget-elo-sub">0 / 250</div>
+                            </div>
+                        </div>
+                        <div style="text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--text-muted);">
+                            <div>Ранг: <strong style="color:var(--amber-gold);" id="widget-rank-num">#1</strong></div>
+                            <div style="margin-top:2px;">W/R: <strong style="color:var(--success);" id="widget-wr-pct">0%</strong></div>
+                            <div style="margin-top:2px;">Матчи: <strong style="color:#fff;" id="widget-matches-val">0</strong></div>
+                        </div>
+                    </div>
+                    <div class="elo-bar-bg">
+                        <div class="elo-bar-fill" id="widget-elo-progress" style="width: 0%;"></div>
+                    </div>
+                    <div class="elo-bar-footer">
+                        <span id="widget-to-next-lvl">250 до уровня</span>
+                        <span id="widget-discipline-name">STANDRISE</span>
+                    </div>
+                </div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 0.5px;">Выбор соревновательной лиги</div>
+                <div class="league-selector">
+                    <div id="league-card-default" class="league-card active" onclick="selectLeague('default')">
+                        <div class="league-card-title">DEFAULT</div>
+                        <div class="league-card-sub">Открытая лига</div>
+                    </div>
+                    <div id="league-card-qual" class="league-card locked" onclick="selectLeague('qual')">
+                        <div class="league-card-title"><i class="fa-solid fa-lock" id="icon-qual-lock"></i> QUAL</div>
+                        <div class="league-card-sub">От 5 LVL (1000+)</div>
+                    </div>
+                    <div id="league-card-pro" class="league-card locked" onclick="selectLeague('pro')">
+                        <div class="league-card-title"><i class="fa-solid fa-lock" id="icon-pro-lock"></i> PRO</div>
+                        <div class="league-card-sub">От 9 LVL (2000+)</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        <span id="active-league-title-card">DEFAULT MATCHMAKING</span>
+                        <span style="font-size: 11px; color: var(--success); background: rgba(0,255,102,0.1); padding: 3px 8px; border-radius: 6px;">LIVE</span>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
+                        Интеллектуальный поиск соперников поблизости к вашему ELO. Автоматическая балансировщик равных команд.
+                    </p>
+                    <div class="live-counters" style="margin-bottom: 14px;">
+                        <div class="counter-box" style="padding: 10px 14px;">
+                            <div class="counter-label" style="font-size: 11px;"><span class="dot-online"></span> В игре</div>
+                            <div class="counter-val" id="online-count" style="font-size: 15px;">1</div>
+                        </div>
+                        <div class="counter-box" style="padding: 10px 14px;">
+                            <div class="counter-label" style="font-size: 11px;"><span class="dot-search"></span> В поиске</div>
+                            <div class="counter-val" id="searching-count" style="font-size: 15px;">0</div>
+                        </div>
+                    </div>
+                    <div class="party-selector">
+                        <button type="button" class="party-btn active" id="pbtn-1" onclick="selectPartyLimit(1)">Solo (1)</button>
+                        <button type="button" class="party-btn" id="pbtn-2" onclick="selectPartyLimit(2)">Duo (2)</button>
+                        <button type="button" class="party-btn" id="pbtn-3" onclick="selectPartyLimit(3)">Trio (3)</button>
+                    </div>
+                    <div class="party-slots" id="party-slots-box"></div>
+                    <button type="button" class="btn-plain" onclick="startQueue()">Начать поиск матча</button>
+                </div>
+                <div class="card">
+                    <div class="card-title">
+                        <span><i class="fa-solid fa-user-gear"></i> Данные профиля (<span id="txt-active-discipline" style="color: var(--neon-blue);">Standrise</span>)</span>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label>Никнейм *</label>
+                            <input type="text" id="main-nick" class="input-field" maxlength="18" placeholder="Введите ник" oninput="saveUserDataFromMenu()">
+                        </div>
+                        <div class="input-group" style="margin-bottom: 0;">
+                            <label>Игровой UID *</label>
+                            <input type="text" id="main-uidtag" class="input-field" placeholder="84920144" oninput="saveUserDataFromMenu()">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- ВКЛАДКА 2: МАТЧ И ВЕТО -->
+            <section id="view-match" class="view">
+                <div class="card">
+                    <div class="card-title">
+                        <span id="match-id-title">МАТЧ #SR-9001</span>
+                        <span style="font-size: 12px; color: var(--accent);" id="match-mode-label">Этап: Вето</span>
+                    </div>
+                    <div id="stage-veto">
+                        <p id="veto-hint" style="font-size: 12px; color: var(--amber-gold); font-weight: 600; margin-bottom: 10px;">Нажимайте на карты, чтобы забанить лишние и оставить одну:</p>
+                        <div class="veto-grid" id="veto-grid"></div>
+                    </div>
+                    <div id="stage-lobby" style="display: none;">
+                        <div style="background: var(--bg-deep); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px;">
+                            <div style="font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 6px;">
+                                Выбранная арена: <strong id="chosen-map-label" style="color: var(--neon-blue);">SANDSTONE</strong>
+                            </div>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 12px;">
+                                Капитан-хост создает комнату в игре и приглашает участников по их RISING ID.
+                            </div>
+                            <div id="host-id-list-container" style="display: none;">
+                                <div style="font-size: 11px; font-weight: 700; color: var(--amber-gold); text-transform: uppercase; margin-bottom: 6px;">RISING ID участников для приглашения:</div>
+                                <div id="players-id-copy-list"></div>
+                            </div>
+                        </div>
+                        <!-- ПАНЕЛЬ КАПИТАНА ДЛЯ НАЧИСЛЕНИЯ ELO ПО ID -->
+                        <div id="captain-admin-panel" style="background: var(--bg-deep); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 14px; display: none;">
+                            <div style="font-size: 13px; font-weight: 700; color: var(--amber-gold); margin-bottom: 8px;">
+                                <i class="fa-solid fa-crown"></i> Кабинет Капитана: Начисление ELO по RISING ID
+                            </div>
+                            <div style="display: grid; grid-template-columns: 1fr 100px; gap: 8px; margin-bottom: 8px;">
+                                <input type="text" id="captain-target-id" class="input-field" placeholder="RISING ID игрока" style="margin:0; padding:10px 12px; font-size:13px;">
+                                <input type="number" id="captain-elo-delta" class="input-field" placeholder="+/- ELO" style="margin:0; padding:10px 12px; font-size:13px;" value="25">
+                            </div>
+                            <button type="button" class="btn-primary" onclick="captainAssignElo()" style="padding: 10px; font-size: 14px; background: var(--amber-gold); color: #000;">Начислить ELO игроку</button>
+                        </div>
+                        <button type="button" class="btn-primary" onclick="openResultModal()" style="background: #059669;">Завершить матч и ввести итог</button>
+                    </div>
+                    <div id="stage-result" style="display: none;">
+                        <div style="text-align: center; padding: 8px 0 14px 0;">
+                            <div style="font-size: 11px; color: var(--success); font-weight: 800; text-transform: uppercase;" id="result-publish-title">Протокол матча опубликован</div>
+                            <div id="final-score-banner" class="font-cyber" style="font-size: 30px; font-weight: 900; margin: 6px 0;">13 : 9</div>
+                            <div id="final-elo-banner" style="font-size: 12px; color: var(--text-muted);"></div>
+                        </div>
+                        <button type="button" onclick="switchView('play')" class="btn-primary" style="margin-top: 14px;">Вернуться в меню</button>
+                    </div>
+                </div>
+                <div class="team-grid">
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-title" style="font-size: 15px; color: var(--amber-gold);">Team Alpha (Баланс ELO)</div>
+                        <div id="roster-alpha"></div>
+                    </div>
+                    <div class="card" style="margin-bottom: 0;">
+                        <div class="card-title" style="font-size: 15px; color: var(--accent);">Team Bravo (Баланс ELO)</div>
+                        <div id="roster-bravo"></div>
+                    </div>
+                </div>
+            </section>
+            <!-- ВКЛАДКА 3: МАГАЗИН ЗВЕЗД (ПОЛНОСТЬЮ РАЗБЛОКИРОВАННЫЙ) -->
+            <section id="view-battlepass" class="view">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Магазин звезд (Авто-выдача по ID)</span>
+                        <i class="fa-solid fa-star" style="color: var(--amber-gold);"></i>
+                    </div>
+                    <div class="srid-copy-banner">
+                        <div>
+                            <div style="font-size: 10px; color: var(--neon-blue); font-weight: 800; text-transform: uppercase;">Ваш RISING ID для оплаты в боте:</div>
+                            <div id="shop-srid-display" class="font-cyber" style="font-size: 16px; font-weight: 900; color: #fff; margin-top: 2px;">SR-000000</div>
+                        </div>
+                        <button type="button" onclick="copyPlatformCode()" class="btn-primary" style="width: auto; padding: 8px 14px; font-size: 12px; background: var(--neon-blue); color: #000;">Скопировать</button>
+                    </div>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">
+                        1. Скопируй свой <strong>RISING ID</strong> выше.<br>
+                        2. Перейди в <strong style="color:#fff;">@SR_RISING_DONATE_BOT</strong>, отправь свой уникальный ID и оплати Звездами.<br>
+                        3. Донат бот ищет ваш аккаунт по уникальному ID и <strong>мгновенно начисляет за секунду</strong> выбранную опцию!
+                    </p>
+                    <div class="shop-section-title"><i class="fa-solid fa-shield-halved"></i> Кланы и оформление профиля</div>
+                    <div class="shop-grid">
+                        <div class="shop-card">
+                            <div>
+                                <span class="dev-badge-tag">Разблокировано</span>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 900; margin-bottom: 4px;">Создание клана</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Отдельный клан со стартом от 0 ELO.</div>
+                                <div style="font-size: 12px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">Цена: 1 Звезда</div>
+                            </div>
+                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="background: var(--amber-gold); color: #000; padding: 9px; font-size: 11px;">КУПИТЬ В БОТЕ (1 Звезда)</a>
+                        </div>
+                        <div class="shop-card">
+                            <div>
+                                <span class="dev-badge-tag">Разблокировано</span>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 900; margin-bottom: 4px;">Баннер из фото</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Собственное изображение в шапку профиля.</div>
+                                <div style="font-size: 12px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">Цена: 5 Звезд</div>
+                            </div>
+                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 9px; font-size: 11px;">КУПИТЬ В БОТЕ (5 Звезд)</a>
+                        </div>
+                        <div class="shop-card">
+                            <div>
+                                <span class="dev-badge-tag">Разблокировано</span>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 900; margin-bottom: 4px;">Расширение клана</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Увеличение состава с 10 до 20 мест.</div>
+                                <div style="font-size: 12px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">Цена: 15 Звезд</div>
+                            </div>
+                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 9px; font-size: 11px;">КУПИТЬ В БОТЕ (15 Звезд)</a>
+                        </div>
+                    </div>
+                    <div class="shop-section-title"><i class="fa-solid fa-gem"></i> Цветные рамки для аватарки (Каждая по 2 Звезды)</div>
+                    <div class="shop-grid">
+                        <div class="shop-card">
+                            <div>
+                                <span class="dev-badge-tag">Разблокировано</span>
+                                <div class="ava-frame-preview ava-frame-cyan">SR</div>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; margin-bottom: 4px;">Голубой Неон</div>
+                                <div style="font-size: 11px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">2 Звезды</div>
+                            </div>
+                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</a>
+                        </div>
+                        <div class="shop-card">
+                            <div>
+                                <span class="dev-badge-tag">Разблокировано</span>
+                                <div class="ava-frame-preview ava-frame-gold">SR</div>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; margin-bottom: 4px;">Золотой Стандарт</div>
+                                <div style="font-size: 11px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">2 Звезды</div>
+                            </div>
+                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</a>
+                        </div>
+                        <div class="shop-card">
+                            <div>
+                                <span class="dev-badge-tag">Разблокировано</span>
+                                <div class="ava-frame-preview ava-frame-crimson">SR</div>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; margin-bottom: 4px;">Алый Импульс</div>
+                                <div style="font-size: 11px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">2 Звезды</div>
+                            </div>
+                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</a>
+                        </div>
+                        <div class="shop-card">
+                            <div>
+                                <span class="dev-badge-tag">Разблокировано</span>
+                                <div class="ava-frame-preview ava-frame-emerald">SR</div>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; margin-bottom: 4px;">Изумрудный Свет</div>
+                                <div style="font-size: 11px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">2 Звезды</div>
+                            </div>
+                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- ВКЛАДКА 4: КЛАНЫ -->
+            <section id="view-clans" class="view">
+                <div class="card">
+                    <div class="card-title">
+                        <span>Клановые войны</span>
+                        <span id="clan-discipline-badge" style="font-size: 12px; color: var(--neon-blue);">Standrise</span>
+                    </div>
+                    <div id="clan-locked-view" style="text-align: center; padding: 26px 10px;">
+                        <span class="dev-badge-tag" style="background:rgba(255,170,0,0.1); border-color:var(--amber-gold); color:var(--amber-gold);">Доступно в магазине</span>
+                        <i class="fa-solid fa-shield-halved" style="font-size: 38px; color: var(--amber-gold); margin: 12px 0;"></i>
+                        <h3 class="font-cyber" style="font-size: 16px; margin-bottom: 6px;">КЛАН НЕ СОЗДАН (<span id="locked-clan-game">Standrise</span>)</h3>
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">
+                            Магазин разблокирован! Приобретите создание клана через бота по вашему RISING ID.
+                        </p>
+                        <button type="button" class="btn-primary" onclick="switchView('battlepass')" style="background: var(--amber-gold); color: #000; padding: 12px;">Перейти в магазин звезд</button>
+                    </div>
+                    <div id="clan-active-view" style="display: none;">
+                        <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
+                            Отдельная соревновательная среда для кланов в дисциплине <strong id="active-clan-game-txt" style="color:#fff;">Standrise</strong>. Старт с 0 ELO!
+                        </p>
+                        <div style="background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <div>
+                                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Ваш клан</div>
+                                    <div id="my-clan-name" class="font-cyber" style="font-size: 15px; font-weight: 900; color: #fff;">[TAG] Клан</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Клановое ELO</div>
+                                    <div id="my-clan-elo" class="font-cyber" style="font-size: 18px; font-weight: 900; color: var(--amber-gold);">0 ELO</div>
+                                </div>
+                            </div>
+                            <div style="font-size: 11px; color: var(--success); font-weight: 600;" id="clan-slots-info">Состав: 5 / 10 мест</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- ВКЛАДКА 5: ЛАДДЕР -->
+            <section id="view-ladder" class="view">
+                <div class="card" style="padding: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <div>
+                            <div class="font-cyber" style="font-size: 16px; font-weight: 900;">Лидерборд (<span id="ladder-game-title">Standrise</span>)</div>
+                            <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px;">Сезон 2 • Кликните на ник для просмотра профиля</div>
+                        </div>
+                        <button type="button" onclick="renderLeaderboards()" class="btn-secondary" style="width: auto; padding: 6px 12px; margin: 0; font-size: 11px;"><i class="fa-solid fa-rotate"></i></button>
+                    </div>
+                    <div class="ladder-tabs">
+                        <button type="button" class="ladder-tab-btn active" id="tab-btn-players" onclick="switchLeaderboardMode('players')">Топ Игроков</button>
+                        <button type="button" class="ladder-tab-btn" id="tab-btn-clans" onclick="switchLeaderboardMode('clans')">Топ Кланов</button>
+                    </div>
+                    <div class="ladder-podium" id="ladder-podium-box"></div>
+                    <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 14px 0 6px 0; letter-spacing: 0.5px;">Все игроки в рейтинге</div>
+                    <table class="ladder-table">
+                        <thead>
+                            <tr>
+                                <th class="col-rank">#</th>
+                                <th class="col-player" id="th-name-col">Игрок</th>
+                                <th class="col-lvl">LVL</th>
+                                <th class="col-wr">WR%</th>
+                                <th class="col-elo">ELO</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ladder-tbody"></tbody>
+                    </table>
+                </div>
+            </section>
+            <!-- ВКЛАДКА 6: ПРОФИЛЬ -->
+            <section id="view-profile" class="view">
+                <div class="card" style="padding-top: 14px;">
+                    <div id="prof-banner-preview" class="profile-banner-box">
+                        <div class="profile-banner-overlay"></div>
+                    </div>
+                    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; padding: 0 6px;">
+                        <div style="display: flex; align-items: flex-end; gap: 12px;">
+                            <div id="prof-avatar" class="prof-avatar-main" style="width:76px; height:76px; border-radius:18px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-family:'Orbitron',sans-serif; font-size:28px; font-weight:900; position:relative; z-index:2; border:3px solid var(--border-active);">P</div>
+                            <div style="padding-bottom: 2px;">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <h2 id="prof-nick" style="font-size: 18px; font-weight: 900;">Player</h2>
+                                    <div class="lvl-badge" id="prof-lvl">1</div>
+                                </div>
+                                <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace;">
+                                    RISING ID: <strong id="prof-platform-code" style="color: var(--neon-blue);">SR-000000</strong> | UID: <strong id="prof-srid" style="color: #fff;">—</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" onclick="copyPlatformCode()" class="btn-secondary" style="width: auto; padding: 6px 10px; margin:0; font-size: 11px;"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <div class="stat-lbl">Матчи</div>
+                            <div class="stat-val" id="stat-matches">0</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-lbl">Винрейт</div>
+                            <div class="stat-val" id="stat-wr" style="color: var(--success);">0%</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-lbl">Личное ELO</div>
+                            <div class="stat-val" id="stat-elo-val" style="color: var(--accent);">0</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 14px;">
+                        <div class="input-group">
+                            <label>Изменить никнейм</label>
+                            <input type="text" id="prof-edit-nick" class="input-field" placeholder="Новый ник" oninput="updateProfileFromSettings()">
+                        </div>
+                        <div class="input-group">
+                            <label>Изменить игровой UID</label>
+                            <input type="text" id="prof-edit-uid" class="input-field" placeholder="Новый UID" oninput="updateProfileFromSettings()">
+                        </div>
+                    </div>
+                    <a href="https://t.me/sr_rising_support_bot" target="_blank" class="btn-secondary" style="color: var(--neon-blue); border-color: var(--border-active);">Поддержка / Жалобы</a>
+                    <button type="button" onclick="logoutAccount()" class="btn-secondary" style="color: var(--amber-gold); border-color: var(--amber-gold); margin-top: 8px;">Выйти из аккаунта</button>
+                    <button type="button" onclick="deleteAccountData()" class="btn-danger">Удалить профиль и сбросить аккаунт</button>
+                </div>
+            </section>
+        </main>
+        <nav>
+            <button type="button" class="nav-btn" data-tab="ladder" onclick="switchView('ladder')">
+                <i class="fa-solid fa-trophy"></i>
+                <span>Топ</span>
+            </button>
+            <button type="button" class="nav-btn" data-tab="clans" onclick="switchView('clans')">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Кланы</span>
+            </button>
+            <button type="button" class="nav-btn active" data-tab="play" onclick="switchView('play')">
+                <i class="fa-solid fa-play"></i>
+                <span>Играть</span>
+            </button>
+            <button type="button" class="nav-btn" data-tab="battlepass" onclick="switchView('battlepass')">
+                <i class="fa-solid fa-store"></i>
+                <span>Магазин</span>
+            </button>
+            <button type="button" class="nav-btn" data-tab="profile" onclick="switchView('profile')">
+                <i class="fa-solid fa-user"></i>
+                <span>Профиль</span>
+            </button>
+        </nav>
+    </div>
+    <!-- МОДАЛКА: ПРОСМОТР ПРОФИЛЯ ЧЕРЕЗ ЛАДДЕР -->
+    <div id="profile-view-modal" class="overlay">
+        <div class="modal-box" style="text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h3 class="font-display" style="font-size: 18px; text-transform: uppercase;">Профиль игрока</h3>
+                <button type="button" onclick="closeProfileModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                <div id="modal-p-ava" style="width: 50px; height: 50px; border-radius: 12px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron',sans-serif; font-size: 20px; font-weight: 900; color: #fff;">P</div>
+                <div>
+                    <div id="modal-p-nick" class="font-cyber" style="font-size: 16px; font-weight: 900;">Player</div>
+                    <div id="modal-p-srid" style="font-size: 11px; color: var(--neon-blue); font-family: monospace; margin-top: 2px;">SR-000000</div>
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                <div style="background: var(--bg-deep); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center;">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">ELO Рейтинг</div>
+                    <div id="modal-p-elo" class="font-cyber" style="font-size: 16px; font-weight: 900; color: var(--accent); margin-top: 2px;">0</div>
+                </div>
+                <div style="background: var(--bg-deep); border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center;">
+                    <div style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Матчи / Победы</div>
+                    <div id="modal-p-stats" style="font-size: 13px; font-weight: 700; color: #fff; margin-top: 4px;">0 / 0</div>
+                </div>
+            </div>
+            <button type="button" onclick="closeProfileModal()" class="btn-primary" style="padding: 10px;">Закрыть</button>
+        </div>
+    </div>
+    <!-- МОДАЛКИ -->
+    <div id="invite-modal" class="overlay">
+        <div class="modal-box">
+            <h3 class="font-display" style="font-size: 18px; text-transform: uppercase; margin-bottom: 8px;">Пригласить в пати по RISING ID</h3>
+            <input type="text" id="invite-srid-input" class="input-field" style="text-align: center; font-family: monospace; font-size: 15px; margin-bottom: 12px;" placeholder="SR-123456">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button type="button" onclick="closeInviteModal()" class="btn-secondary" style="margin: 0; color: var(--text-muted);">Отмена</button>
+                <button type="button" onclick="sendPartyInvite()" class="btn-primary" style="padding: 12px;">Пригласить</button>
+            </div>
+        </div>
+    </div>
+    <div id="queue-overlay" class="overlay">
+        <div class="modal-box">
+            <h3 class="font-cyber" style="font-size: 18px;" id="queue-modal-title">ПОИСК СОПЕРНИКОВ</h3>
+            <p style="font-size: 11px; color: var(--text-muted); margin: 6px 0 10px;" id="queue-modal-desc">Интеллектуальный подбор по ELO...</p>
+            <div id="queue-timer" class="font-cyber" style="font-size: 30px; font-weight: 900; color: #fff; margin: 8px 0;">00:00</div>
+            <div id="queue-players-info" style="font-size: 11px; color: var(--amber-gold); margin-bottom: 14px;">В поиске: 1 / 10</div>
+            <button type="button" onclick="cancelQueue()" class="btn-secondary" style="margin: 0;">Отменить поиск</button>
+        </div>
+    </div>
+    <div id="accept-overlay" class="overlay">
+        <div class="modal-box" style="border-color: var(--accent);">
+            <h3 class="font-cyber" style="font-size: 20px; color: #fff;">МАТЧ НАЙДЕН</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin: 6px 0 8px;">Подтвердите готовность к матчу</p>
+            <div id="accept-timer" class="font-cyber" style="font-size: 26px; font-weight: 900; color: var(--amber-gold); margin-bottom: 14px;">15</div>
+            <button type="button" onclick="acceptMatch()" class="btn-primary" style="background: #059669; color: #fff; font-size: 16px; padding: 12px;">ПОДТВЕРДИТЬ</button>
+        </div>
+    </div>
+    <div id="result-modal" class="overlay">
+        <div class="modal-box">
+            <h3 class="font-display" style="font-size: 18px; text-transform: uppercase; margin-bottom: 10px;">Публикация счета</h3>
+            <form onsubmit="submitMatchResult(event)">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                    <div>
+                        <label style="font-size: 10px; color: var(--amber-gold); display: block; margin-bottom: 4px;">Alpha</label>
+                        <input type="number" id="res-alpha" class="input-field" style="text-align: center; font-size: 16px;" value="13" required>
+                    </div>
+                    <div>
+                        <label style="font-size: 10px; color: var(--accent); display: block; margin-bottom: 4px;">Bravo</label>
+                        <input type="number" id="res-bravo" class="input-field" style="text-align: center; font-size: 16px;" value="8" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Опубликовать</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const firebaseConfig = {
+            apiKey: "ТВОЙ_API_KEY",
+            authDomain: "ТВОЙ_ПРОЕКТ.firebaseapp.com",
+            projectId: "ТВОЙ_PROJECT_ID",
+            storageBucket: "ТВОЙ_ПРОЕКТ.appspot.com",
+            messagingSenderId: "ТВОЙ_SENDER_ID",
+            appId: "ТВОЙ_APP_ID"
+        };
+        let db = null;
+        try {
+            if (typeof firebase !== 'undefined' && !firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+            }
+        } catch (e) { db = null; }
+        let authMode = 'login'; // 'login' или 'reg'
+        let account = {
+            uid: null,
+            platformCode: null,
+            password: null,
+            game: 'Standrise',
+            activeLeague: 'default',
+            profiles: {
+                Standrise: { nick: '', uidtag: '', elo: 0, matches: 0, wins: 0, losses: 0, clan: null },
+                Brawlstars: { nick: '', uidtag: '', elo: 0, matches: 0, wins: 0, losses: 0, clan: null }
+            }
+        };
+        const STANDRISE_MAPS = ['ZONE 9', 'SANDSTONE', 'SAKURA', 'BREEZE', 'RUST'];
+        const BRAWLSTARS_MODES = ['Броулбол', 'Горячая зона', 'Захват кристаллов', 'Нокаут', 'Награда'];
+        let partyLimit = 1;
+        let partyTeammates = [null, null];
+        let activeInviteSlot = 0;
+        let queueInterval = null, readyInterval = null, queueUnsubscribe = null;
+        let queueRef = null, presenceRef = null, matchState = null, saveTimer = null;
+        let currentLeaderboardMode = 'players';
+        function getRequiredPlayersCount() {
+            return account.game === 'Brawlstars' ? 6 : 10;
+        }
+        function getActiveProfile() {
+            return account.profiles[account.game];
+        }
+        function notify(msg) {
+            const box = document.getElementById('toast-wrap');
+            if (!box) return;
+            const el = document.createElement('div');
+            el.className = 'toast';
+            el.textContent = msg;
+            box.appendChild(el);
+            setTimeout(() => { if (el.parentNode) el.remove(); }, 3800);
+        }
+        function copyPlatformCode() {
+            if (!account.platformCode) return;
+            navigator.clipboard.writeText(account.platformCode);
+            notify(`RISING ID ${account.platformCode} скопирован!`);
+        }
+        function saveAccountLocal() {
+            try {
+                if (account.platformCode) {
+                    localStorage.setItem('sr_rising_active_id', account.platformCode);
+                    localStorage.setItem(`sr_rising_acc_${account.platformCode}`, JSON.stringify(account));
+                }
+            } catch(e){}
+        }
+        function syncUserToFirestore() {
+            if (!db || !account.platformCode) return;
+            const prof = getActiveProfile();
+            try {
+                db.collection('users').doc(`${account.platformCode}_${account.game}`).set({
+                    uid: account.platformCode,
+                    password: account.password,
+                    platformCode: account.platformCode,
+                    game: account.game,
+                    nick: prof.nick,
+                    uidtag: prof.uidtag,
+                    elo: prof.elo,
+                    matches: prof.matches,
+                    wins: prof.wins,
+                    losses: prof.losses,
+                    lastActive: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true }).catch(()=>{});
+            } catch(e){}
+        }
+        // АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ С ПАРОЛЕМ И УНИКАЛЬНЫМ ID
+        function switchAuthMode(mode) {
+            authMode = mode;
+            document.getElementById('auth-tab-login').classList.toggle('active', mode === 'login');
+            document.getElementById('auth-tab-reg').classList.toggle('active', mode === 'reg');
+            document.getElementById('group-auth-nick').style.display = (mode === 'reg') ? 'block' : 'none';
+            document.getElementById('auth-submit-btn').textContent = (mode === 'login') ? 'Войти в систему' : 'Зарегистрировать аккаунт';
+            document.getElementById('auth-id-label').textContent = (mode === 'login') ? 'Ваш уникальный RISING ID *' : 'Придумайте или сгенерируйте RISING ID *';
+            
+            if (mode === 'reg' && !document.getElementById('input-auth-id').value) {
+                document.getElementById('input-auth-id').value = 'SR-' + Math.floor(100000 + Math.random() * 899999);
+            }
+        }
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            const idInput = document.getElementById('input-auth-id').value.trim();
+            const passInput = document.getElementById('input-auth-pass').value.trim();
+            const nickInput = document.getElementById('input-auth-nick').value.trim();
+            if (!idInput || !passInput) {
+                notify("Заполните обязательные поля!");
+                return;
+            }
+            let savedData = null;
+            try {
+                const raw = localStorage.getItem(`sr_rising_acc_${idInput}`);
+                if (raw) savedData = JSON.parse(raw);
+            } catch(e){}
+            if (authMode === 'login') {
+                if (savedData) {
+                    if (savedData.password === passInput) {
+                        account = savedData;
+                        notify("Успешный вход в систему!");
+                        finishAuthProcess();
+                    } else {
+                        notify("Неверный пароль для этого RISING ID!");
+                    }
+                } else {
+                    // Если локально нет, проверим демо / создадим или дадим войти
+                    account.platformCode = idInput;
+                    account.password = passInput;
+                    account.profiles.Standrise.nick = idInput;
+                    account.profiles.Standrise.uidtag = idInput;
+                    account.profiles.Brawlstars.nick = idInput;
+                    account.profiles.Brawlstars.uidtag = idInput;
+                    saveAccountLocal();
+                    notify("Аккаунт загружен!");
+                    finishAuthProcess();
+                }
+            } else {
+                // Регистрация
+                if (savedData) {
+                    notify("Такой RISING ID уже занят! Войдите или смените ID.");
+                    return;
+                }
+                if (!nickInput) {
+                    notify("Введите никнейм для регистрации!");
+                    return;
+                }
+                account.platformCode = idInput;
+                account.password = passInput;
+                account.profiles.Standrise.nick = nickInput;
+                account.profiles.Standrise.uidtag = idInput;
+                account.profiles.Brawlstars.nick = nickInput;
+                account.profiles.Brawlstars.uidtag = idInput;
+                saveAccountLocal();
+                syncUserToFirestore();
+                notify("Аккаунт успешно создан!");
+                finishAuthProcess();
+            }
+        }
+        function finishAuthProcess() {
+            document.getElementById('screen-auth').style.display = 'none';
+            initAppShell();
+        }
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('input-auth-id').value = 'SR-' + Math.floor(100000 + Math.random() * 899999);
+            try {
+                const activeId = localStorage.getItem('sr_rising_active_id');
+                if (activeId) {
+                    const raw = localStorage.getItem(`sr_rising_acc_${activeId}`);
+                    if (raw) {
+                        account = JSON.parse(raw);
+                        document.getElementById('screen-auth').style.display = 'none';
+                        initAppShell();
+                        return;
+                    }
+                }
+            } catch(e){}
+        });
+        function logoutAccount() {
+            try { localStorage.removeItem('sr_rising_active_id'); } catch(e){}
+            location.reload();
+        }
+        function toggleGameDiscipline() {
+            account.game = account.game === 'Standrise' ? 'Brawlstars' : 'Standrise';
+            saveAccountLocal();
+            applyDisciplineUI();
+            renderPartySlots();
+            renderLeaderboards();
+            notify(`Дисциплина переключена на ${account.game}`);
+        }
+        function selectLeague(league) {
+            const prof = getActiveProfile();
+            const currentLvl = Math.floor((prof.elo || 0) / 250) + 1;
+            if (league === 'qual' && currentLvl < 5) {
+                notify("Элитная лига QUAL доступна с 5 уровня (от 1000 ELO)!");
+                return;
+            }
+            if (league === 'pro' && currentLvl < 9) {
+                notify("Лига PRO доступна с 9 уровня (от 2000 ELO)!");
+                return;
+            }
+            account.activeLeague = league;
+            document.querySelectorAll('.league-card').forEach(c => c.classList.remove('active'));
+            document.getElementById(`league-card-${league}`).classList.add('active');
+        }
+        function applyDisciplineUI() {
+            const prof = getActiveProfile();
+            document.getElementById('hdr-game-name').textContent = account.game;
+            document.getElementById('txt-active-discipline').textContent = account.game;
+            document.getElementById('clan-discipline-badge').textContent = account.game;
+            document.getElementById('locked-clan-game').textContent = account.game;
+            document.getElementById('widget-discipline-name').textContent = account.game.toUpperCase();
+            document.getElementById('ladder-game-title').textContent = account.game;
+            document.getElementById('main-nick').value = prof.nick || '';
+            document.getElementById('main-uidtag').value = prof.uidtag || '';
+            document.getElementById('prof-edit-nick').value = prof.nick || '';
+            document.getElementById('prof-edit-uid').value = prof.uidtag || '';
+            const lvl = Math.floor((prof.elo || 0) / 250) + 1;
+            const qualCard = document.getElementById('league-card-qual');
+            const proCard = document.getElementById('league-card-pro');
+            if (lvl >= 5) {
+                qualCard.classList.remove('locked');
+                document.getElementById('icon-qual-lock').className = 'fa-solid fa-bolt';
+            } else {
+                qualCard.classList.add('locked');
+                document.getElementById('icon-qual-lock').className = 'fa-solid fa-lock';
+            }
+            if (lvl >= 9) {
+                proCard.classList.remove('locked');
+                document.getElementById('icon-pro-lock').className = 'fa-solid fa-crown';
+            } else {
+                proCard.classList.add('locked');
+                document.getElementById('icon-pro-lock').className = 'fa-solid fa-lock';
+            }
+            updateUI();
+        }
+        function initAppShell() {
+            document.getElementById('app-shell').style.display = 'flex';
+            syncUserToFirestore();
+            applyDisciplineUI();
+            renderPartySlots();
+            renderLeaderboards();
+            initRealtimeSync();
+        }
+        function saveUserDataFromMenu() {
+            const prof = getActiveProfile();
+            prof.nick = document.getElementById('main-nick').value.trim();
+            prof.uidtag = document.getElementById('main-uidtag').value.trim();
+            document.getElementById('prof-edit-nick').value = prof.nick;
+            document.getElementById('prof-edit-uid').value = prof.uidtag;
+            
+            saveAccountLocal();
+            updateUI();
+            renderPartySlots();
+            if(saveTimer) clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => { syncUserToFirestore(); renderLeaderboards(); }, 600);
+        }
+        function updateProfileFromSettings() {
+            const prof = getActiveProfile();
+            prof.nick = document.getElementById('prof-edit-nick').value.trim();
+            prof.uidtag = document.getElementById('prof-edit-uid').value.trim();
+            document.getElementById('main-nick').value = prof.nick;
+            document.getElementById('main-uidtag').value = prof.uidtag;
+            saveAccountLocal();
+            updateUI();
+            renderPartySlots();
+            if(saveTimer) clearTimeout(saveTimer);
+            saveTimer = setTimeout(() => { syncUserToFirestore(); renderLeaderboards(); }, 600);
+        }
+        function deleteAccountData() {
+            if (confirm("Вы действительно хотите удалить профиль и сбросить аккаунт?")) {
+                try {
+                    localStorage.removeItem(`sr_rising_acc_${account.platformCode}`);
+                    localStorage.removeItem('sr_rising_active_id');
+                } catch(e){}
+                location.reload();
+            }
+        }
+        function updateUI() {
+            const prof = getActiveProfile();
+            document.getElementById('hdr-nick').textContent = prof.nick || 'Player';
+            document.getElementById('hdr-elo').textContent = prof.elo + ' ELO';
+            document.getElementById('play-mini-nick').textContent = prof.nick || 'Player';
+            document.getElementById('play-mini-id').textContent = `RISING ID: ${account.platformCode} • UID: ${prof.uidtag || '—'}`;
+            document.getElementById('prof-nick').textContent = prof.nick || 'Player';
+            document.getElementById('prof-srid').textContent = prof.uidtag || '—';
+            document.getElementById('prof-platform-code').textContent = account.platformCode;
+            document.getElementById('shop-srid-display').textContent = account.platformCode;
+            document.getElementById('stat-matches').textContent = prof.matches || 0;
+            document.getElementById('widget-matches-val').textContent = prof.matches || 0;
+            document.getElementById('stat-elo-val').textContent = prof.elo || 0;
+            const wr = prof.matches > 0 ? Math.round((prof.wins / prof.matches) * 100) : 0;
+            document.getElementById('stat-wr').textContent = wr + '%';
+            document.getElementById('widget-wr-pct').textContent = wr + '%';
+            document.getElementById('widget-elo-num').textContent = prof.elo || 0;
+            const lvl = Math.floor((prof.elo || 0) / 250) + 1;
+            const currentLvlBase = (lvl - 1) * 250;
+            const nextLvlTarget = lvl * 250;
+            const progressPct = Math.min(100, Math.max(0, ((prof.elo - currentLvlBase) / 250) * 100));
+            
+            document.getElementById('hdr-lvl').textContent = lvl;
+            document.getElementById('prof-lvl').textContent = lvl;
+            document.getElementById('widget-lvl-circle').textContent = lvl;
+            document.getElementById('widget-elo-sub').textContent = `${prof.elo} / ${nextLvlTarget}`;
+            document.getElementById('widget-elo-progress').style.width = progressPct + '%';
+            document.getElementById('widget-to-next-lvl').textContent = `${Math.max(0, nextLvlTarget - prof.elo)} до уровня`;
+            const avaEl = document.getElementById('prof-avatar');
+            avaEl.textContent = prof.nick ? prof.nick[0].toUpperCase() : 'P';
+            document.getElementById('mini-ava-box').textContent = prof.nick ? prof.nick[0].toUpperCase() : 'P';
+        }
+        function switchView(v) {
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.getElementById('view-' + v).classList.add('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === v));
+            if(v === 'ladder') renderLeaderboards();
+        }
+        function switchLeaderboardMode(mode) {
+            currentLeaderboardMode = mode;
+            document.getElementById('tab-btn-players').classList.toggle('active', mode === 'players');
+            document.getElementById('tab-btn-clans').classList.toggle('active', mode === 'clans');
+            document.getElementById('th-name-col').textContent = mode === 'players' ? 'Игрок' : 'Клан';
+            renderLeaderboards();
+        }
+        function selectPartyLimit(limit) {
+            partyLimit = limit;
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById('pbtn-' + i);
+                if (btn) btn.classList.toggle('active', i === limit);
+            }
+            if (limit === 1) partyTeammates = [null, null];
+            if (limit === 2) partyTeammates[1] = null;
+            renderPartySlots();
+        }
+        function renderPartySlots() {
+            const box = document.getElementById('party-slots-box');
+            if (!box) return;
+            const prof = getActiveProfile();
+            let html = `
+                <div class="party-slot">
+                    <div class="slot-avatar filled">${prof.nick ? prof.nick[0].toUpperCase() : 'P'}</div>
+                    <div class="slot-name">${prof.nick || 'Player'}</div>
+                    <div class="slot-status">Вы</div>
+                </div>
+            `;
+            for (let i = 0; i < partyLimit - 1; i++) {
+                const mate = partyTeammates[i];
+                if (mate) {
+                    html += `
+                        <div class="party-slot" onclick="removeTeammate(${i})">
+                            <div class="slot-avatar filled">${mate.nick[0].toUpperCase()}</div>
+                            <div class="slot-name">${mate.nick}</div>
+                            <div class="slot-status">Готов</div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="party-slot" onclick="openInviteModal(${i})">
+                            <div class="slot-avatar"><i class="fa-solid fa-plus"></i></div>
+                            <div class="slot-name" style="color:var(--text-muted);">Свободно</div>
+                            <div class="slot-status" style="color:var(--text-muted);">+</div>
+                        </div>
+                    `;
+                }
+            }
+            box.innerHTML = html;
+        }
+        function openInviteModal(idx) {
+            activeInviteSlot = idx;
+            document.getElementById('invite-srid-input').value = '';
+            document.getElementById('invite-modal').style.display = 'flex';
+        }
+        function closeInviteModal() { document.getElementById('invite-modal').style.display = 'none'; }
+        
+        function sendPartyInvite() {
+            const val = document.getElementById('invite-srid-input').value.trim();
+            if (!val) return;
+            closeInviteModal();
+            partyTeammates[activeInviteSlot] = { nick: val, uidtag: val };
+            renderPartySlots();
+            notify(`Приглашение отправлено игроку с RISING ID: ${val}`);
+        }
+        function removeTeammate(idx) { partyTeammates[idx] = null; renderPartySlots(); }
+        function initRealtimeSync() {
+            if (!db) return;
+            try {
+                presenceRef = db.collection('presence').doc(account.platformCode);
+                presenceRef.set({ uid: account.platformCode, game: account.game, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+                setInterval(() => {
+                    if(presenceRef) presenceRef.set({ uid: account.platformCode, game: account.game, timestamp: firebase.firestore.FieldValue.serverTimestamp() }).catch(()=>{});
+                }, 12000);
+                db.collection('presence').onSnapshot(snap => {
+                    let activeCount = 0;
+                    const now = Date.now();
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        if (data && data.timestamp) {
+                            const tVal = data.timestamp.toMillis ? data.timestamp.toMillis() : (data.timestamp.seconds * 1000);
+                            if (now - tVal < 40000) activeCount++;
+                        } else activeCount++;
+                    });
+                    document.getElementById('online-count').textContent = Math.max(1, activeCount);
+                }, ()=>{});
+            } catch(e){}
+        }
+        function startQueue() {
+            const prof = getActiveProfile();
+            if (!prof.nick || !prof.uidtag) {
+                notify("Сначала введите никнейм и UID!");
+                return;
+            }
+            syncUserToFirestore();
+            const requiredCount = getRequiredPlayersCount();
+            document.getElementById('queue-modal-title').textContent = `ПОИСК (${account.game})`;
+            document.getElementById('queue-modal-desc').textContent = `Умный поиск по ELO (нужно ${requiredCount} игроков)...`;
+            document.getElementById('queue-overlay').style.display = 'flex';
+            
+            let sec = 0;
+            const timerEl = document.getElementById('queue-timer');
+            if(queueInterval) clearInterval(queueInterval);
+            queueInterval = setInterval(() => {
+                sec++;
+                timerEl.textContent = `${String(Math.floor(sec/60)).padStart(2,'0')}:${String(sec%60).padStart(2,'0')}`;
+            }, 1000);
+            if (!db) {
+                setTimeout(() => {
+                    cancelQueue();
+                    let mockPlayers = [{nick: prof.nick, uidtag: prof.uidtag, elo: prof.elo, platformCode: account.platformCode}];
+                    for(let i=1; i<requiredCount; i++) {
+                        let eloVar = prof.elo + Math.floor(Math.random() * 160) - 80;
+                        mockPlayers.push({ nick: `${account.game}_Bot_${i}`, uidtag: '999'+i, elo: Math.max(0, eloVar), platformCode: 'SR-BOT'+i });
+                    }
+                    showReadyCheckModal(mockPlayers);
+                }, 3000);
+                return;
+            }
+            try {
+                queueRef = db.collection('queue').doc(`${account.platformCode}_${account.game}`);
+                queueRef.set({
+                    uid: account.platformCode,
+                    platformCode: account.platformCode,
+                    game: account.game,
+                    nick: prof.nick,
+                    uidtag: prof.uidtag,
+                    elo: prof.elo,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(()=>{});
+                if(queueUnsubscribe) queueUnsubscribe();
+                queueUnsubscribe = db.collection('queue')
+                    .where('game', '==', account.game)
+                    .onSnapshot(snap => {
+                        let realPlayers = [];
+                        snap.forEach(doc => realPlayers.push(doc.data()));
+                        
+                        realPlayers.sort((a,b) => Math.abs(a.elo - prof.elo) - Math.abs(b.elo - prof.elo));
+                        document.getElementById('searching-count').textContent = realPlayers.length;
+                        document.getElementById('queue-players-info').textContent = `В поиске (${account.game}): ${realPlayers.length} / ${requiredCount}`;
+                        if (realPlayers.length >= requiredCount) {
+                            const matched = realPlayers.slice(0, requiredCount);
+                            if (matched.some(p => p.platformCode === account.platformCode)) {
+                                cancelQueue();
+                                showReadyCheckModal(matched);
+                            }
+                        }
+                    }, ()=>{});
+            } catch(e){}
+        }
+        function cancelQueue() {
+            if(queueInterval) clearInterval(queueInterval);
+            if(queueUnsubscribe) { queueUnsubscribe(); queueUnsubscribe = null; }
+            if(queueRef) { queueRef.delete().catch(()=>{}); queueRef = null; }
+            document.getElementById('queue-overlay').style.display = 'none';
+        }
+        function showReadyCheckModal(matchedPlayers) {
+            document.getElementById('accept-overlay').style.display = 'flex';
+            let timeLeft = 15;
+            const timerBox = document.getElementById('accept-timer');
+            timerBox.textContent = timeLeft;
+            if(readyInterval) clearInterval(readyInterval);
+            readyInterval = setInterval(() => {
+                timeLeft--;
+                timerBox.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(readyInterval);
+                    document.getElementById('accept-overlay').style.display = 'none';
+                    switchView('play');
+                }
+            }, 1000);
+            window.tempMatchedPlayers = matchedPlayers;
+        }
+        function acceptMatch() {
+            if(readyInterval) clearInterval(readyInterval);
+            document.getElementById('accept-overlay').style.display = 'none';
+            const players = window.tempMatchedPlayers || [];
+            const requiredCount = getRequiredPlayersCount();
+            
+            let fullPlayers = [...players];
+            let prof = getActiveProfile();
+            while(fullPlayers.length < requiredCount) {
+                let eloVar = prof.elo + Math.floor(Math.random() * 160) - 80;
+                fullPlayers.push({ nick: 'Bot_' + Math.floor(Math.random()*900+100), uidtag: '999'+Math.floor(Math.random()*900+100), elo: Math.max(0, eloVar), platformCode: 'SR-BOT' });
+            }
+            fullPlayers.sort((a,b) => b.elo - a.elo);
+            let alphaRaw = [];
+            let bravoRaw = [];
+            
+            fullPlayers.forEach((p, index) => {
+                let teamIndex = Math.floor(index / 2);
+                if (teamIndex % 2 === 0) {
+                    if (index % 2 === 0) alphaRaw.push(p); else bravoRaw.push(p);
+                } else {
+                    if (index % 2 === 0) bravoRaw.push(p); else alphaRaw.push(p);
+                }
+            });
+            pendingMatchData = {
+                id: '#SR-' + Math.floor(1000 + Math.random() * 8999),
+                alpha: alphaRaw.map((p,i)=>({ nick: p.nick, uidtag: p.uidtag, elo: p.elo||0, platformCode: p.platformCode, isSelf: p.platformCode===account.platformCode, isCaptain: i===0 })),
+                bravo: bravoRaw.map((p,i)=>({ nick: p.nick, uidtag: p.uidtag, elo: p.elo||0, platformCode: p.platformCode, isSelf: p.platformCode===account.platformCode, isCaptain: i===0 }))
+            };
+            setupMatchInstance(pendingMatchData);
+            pendingMatchData = null;
+        }
+        function setupMatchInstance(data) {
+            switchView('match');
+            const isStandrise = account.game === 'Standrise';
+            const items = isStandrise ? STANDRISE_MAPS : BRAWLSTARS_MODES;
+            matchState = {
+                id: data.id,
+                alpha: data.alpha,
+                bravo: data.bravo,
+                host: data.alpha[0],
+                items: items.map(name => ({ name, banned: false })),
+                chosenItem: items[0]
+            };
+            document.getElementById('match-id-title').textContent = `MATCH ${matchState.id}`;
+            document.getElementById('match-mode-label').textContent = "Этап: Вето (Бан карт)";
+            document.getElementById('stage-veto').style.display = 'block';
+            document.getElementById('stage-lobby').style.display = 'none';
+            document.getElementById('stage-result').style.display = 'none';
+            renderRosters();
+            renderVeto();
+        }
+        function renderRosters() {
+            const renderList = list => list.map(p => `
+                <div class="roster-row">
+                    <div><strong style="color:${p.isSelf?'var(--amber-gold)':'#fff'}">${p.nick}</strong></div>
+                    <div style="font-family:'Orbitron',sans-serif; font-size:12px; font-weight:800; color:var(--accent);">${p.elo} ELO</div>
+                </div>
+            `).join('');
+            document.getElementById('roster-alpha').innerHTML = renderList(matchState.alpha);
+            document.getElementById('roster-bravo').innerHTML = renderList(matchState.bravo);
+        }
+        function renderVeto() {
+            document.getElementById('veto-grid').innerHTML = matchState.items.map(m => `
+                <div class="map-card ${m.banned?'banned':''}" onclick="banItem('${m.name}')">
+                    <div class="map-card-name">${m.name}</div>
+                </div>
+            `).join('');
+        }
+        function banItem(name) {
+            const target = matchState.items.find(m => m.name === name);
+            if (!target || target.banned) return;
+            target.banned = true;
+            renderVeto();
+            processVetoTurn();
+        }
+        function processVetoTurn() {
+            const left = matchState.items.filter(m => !m.banned);
+            if (left.length === 1) {
+                matchState.chosenItem = left[0].name;
+                document.getElementById('stage-veto').style.display = 'none';
+                document.getElementById('stage-lobby').style.display = 'block';
+                document.getElementById('chosen-map-label').textContent = matchState.chosenItem;
+                
+                const others = [...matchState.alpha, ...matchState.bravo].filter(p => !p.isSelf);
+                document.getElementById('players-id-copy-list').innerHTML = others.map(p => `
+                    <div class="id-copy-box">
+                        <div><strong>${p.nick}</strong> (RISING ID: <span style="color:var(--neon-blue);">${p.platformCode}</span>)</div>
+                        <button type="button" class="id-copy-btn" onclick="navigator.clipboard.writeText('${p.platformCode}')">Copy ID</button>
+                    </div>
+                `).join('');
+                document.getElementById('host-id-list-container').style.display = matchState.host.isSelf ? 'block' : 'none';
+                
+                // Проверяем, является ли текущий игрок капитаном (первый игрок Alpha)
+                const isUserCaptain = matchState.alpha[0].isSelf;
+                document.getElementById('captain-admin-panel').style.display = isUserCaptain ? 'block' : 'none';
+                return;
+            }
+        }
+        // КАБИНЕТ КАПИТАНА: НАЧИСЛЕНИЕ ELO ПО РИСИНГ ID
+        function captainAssignElo() {
+            const targetId = document.getElementById('captain-target-id').value.trim();
+            const delta = parseInt(document.getElementById('captain-elo-delta').value, 10);
+            if (!targetId || isNaN(delta)) {
+                notify("Введите корректный RISING ID и число ELO!");
+                return;
+            }
+            if (targetId === account.platformCode) {
+                const prof = getActiveProfile();
+                prof.elo = Math.max(0, prof.elo + delta);
+                saveAccountLocal();
+                syncUserToFirestore();
+                updateUI();
+                renderLeaderboards();
+                notify(`Вам успешно начислено ${delta} ELO! Новый ELO: ${prof.elo}`);
+                document.getElementById('captain-target-id').value = '';
+                return;
+            }
+            if (!db) {
+                notify("Капитанское начисление по ID синхронизировано локально!");
+                return;
+            }
+            db.collection('users').where('platformCode', '==', targetId).where('game', '==', account.game).get().then(snap => {
+                if (snap.empty) {
+                    notify("Игрок с таким RISING ID не найден в сети!");
+                    return;
+                }
+                snap.forEach(doc => {
+                    const currentElo = doc.data().elo || 0;
+                    const newElo = Math.max(0, currentElo + delta);
+                    doc.ref.update({ elo: newElo }).then(() => {
+                        notify(`Игроку ${targetId} успешно изменено ELO на ${delta}!`);
+                        document.getElementById('captain-target-id').value = '';
+                        renderLeaderboards();
+                    });
+                });
+            }).catch(() => {
+                notify("Ошибка при поиске игрока по ID.");
+            });
+        }
+        function openResultModal() { document.getElementById('result-modal').style.display = 'flex'; }
+        function submitMatchResult(e) {
+            e.preventDefault();
+            document.getElementById('result-modal').style.display = 'none';
+            const prof = getActiveProfile();
+            const sA = parseInt(document.getElementById('res-alpha').value, 10);
+            const sB = parseInt(document.getElementById('res-bravo').value, 10);
+            const win = sA > sB;
+            const diff = win ? 35 : -15;
+            prof.matches += 1;
+            if (win) prof.wins += 1; else prof.losses += 1;
+            prof.elo = Math.max(0, prof.elo + diff);
+            let resultBannerText = `Матч завершен! ELO: ${prof.elo} (${diff>0?'+'+diff:diff})`;
+            notify(win ? "Победа! +35 ELO" : "Поражение. -15 ELO");
+            syncUserToFirestore();
+            saveAccountLocal();
+            updateUI();
+            renderLeaderboards();
+            document.getElementById('stage-lobby').style.display = 'none';
+            document.getElementById('stage-result').style.display = 'block';
+            document.getElementById('final-score-banner').textContent = `${sA} : ${sB}`;
+            document.getElementById('final-elo-banner').textContent = resultBannerText;
+        }
+        // ПРОСМОТР ПРОФИЛЯ ПО КЛИКУ В ЛАДДЕРЕ
+        function viewPlayerProfileById(platformCode) {
+            if (!platformCode) return;
+            if (platformCode === account.platformCode) {
+                switchView('profile');
+                return;
+            }
+            if (!db) {
+                notify(`Профиль игрока: ${platformCode}`);
+                return;
+            }
+            db.collection('users').where('platformCode', '==', platformCode).where('game', '==', account.game).get().then(snap => {
+                if (snap.empty) {
+                    notify("Информация об игроке не найдена.");
+                    return;
+                }
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    document.getElementById('modal-p-nick').textContent = data.nick || 'Player';
+                    document.getElementById('modal-p-srid').textContent = `RISING ID: ${data.platformCode}`;
+                    document.getElementById('modal-p-elo').textContent = data.elo || 0;
+                    document.getElementById('modal-p-stats').textContent = `${data.matches || 0} / ${data.wins || 0}`;
+                    document.getElementById('modal-p-ava').textContent = (data.nick || 'P')[0].toUpperCase();
+                    document.getElementById('profile-view-modal').style.display = 'flex';
+                });
+            }).catch(() => {
+                notify("Не удалось загрузить профиль.");
+            });
+        }
+        function closeProfileModal() {
+            document.getElementById('profile-view-modal').style.display = 'none';
+        }
+        async function renderLeaderboards() {
+            let list = [];
+            syncUserToFirestore();
+            if (db) {
+                try {
+                    const snap = await db.collection('users').where('game', '==', account.game).limit(100).get();
+                    snap.forEach(doc => list.push(doc.data()));
+                } catch(e){}
+            }
+            const prof = getActiveProfile();
+            const meIdx = list.findIndex(p => p.platformCode === account.platformCode);
+            const myData = { uid: account.platformCode, platformCode: account.platformCode, game: account.game, nick: prof.nick || 'Player', elo: prof.elo, wins: prof.wins, matches: prof.matches, isMe: true };
+            
+            if (meIdx !== -1) list[meIdx] = myData;
+            else if (prof.nick) list.push(myData);
+            const tbody = document.getElementById('ladder-tbody');
+            const podiumBox = document.getElementById('ladder-podium-box');
+            if (currentLeaderboardMode === 'players') {
+                list.sort((a, b) => (b.elo || 0) - (a.elo || 0));
+                const myRank = list.findIndex(p => p.platformCode === account.platformCode) + 1;
+                if (myRank > 0) document.getElementById('widget-rank-num').textContent = `#${myRank}`;
+                
+                if (list.length > 0) {
+                    const top1 = list[0] || {nick: '—', elo: 0};
+                    const top2 = list[1] || {nick: '—', elo: 0};
+                    const top3 = list[2] || {nick: '—', elo: 0};
+                    podiumBox.innerHTML = `
+                        <div class="podium-card" style="cursor:pointer;" onclick="viewPlayerProfileById('${top2.platformCode || ''}')">
+                            <div class="podium-ava">${top2.nick[0]||'2'}</div>
+                            <div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${top2.nick}</div>
+                            <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--text-muted);">${top2.elo} ELO</div>
+                            <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">#2</div>
+                        </div>
+                        <div class="podium-card first" style="cursor:pointer;" onclick="viewPlayerProfileById('${top1.platformCode || ''}')">
+                            <div class="podium-ava" style="color:var(--amber-gold);">${top1.nick[0]||'1'}</div>
+                            <div style="font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${top1.nick}</div>
+                            <div style="font-family:'Orbitron',sans-serif;font-size:12px;color:var(--amber-gold);font-weight:900;">${top1.elo} ELO</div>
+                            <div style="font-size:10px;color:var(--amber-gold);margin-top:4px;font-weight:800;">#1 WINNER</div>
+                        </div>
+                        <div class="podium-card" style="cursor:pointer;" onclick="viewPlayerProfileById('${top3.platformCode || ''}')">
+                            <div class="podium-ava">${top3.nick[0]||'3'}</div>
+                            <div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${top3.nick}</div>
+                            <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--text-muted);">${top3.elo} ELO</div>
+                            <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">#3</div>
+                        </div>
+                    `;
+                } else {
+                    podiumBox.innerHTML = '';
+                }
+                tbody.innerHTML = list.map((p, i) => `
+                    <tr class="${p.isMe ? 'row-me' : ''}">
+                        <td class="col-rank">#${i + 1}</td>
+                        <td class="col-player"><span class="player-cell-nick" onclick="viewPlayerProfileById('${p.platformCode || ''}')">${p.nick}</span></td>
+                        <td class="col-lvl">${Math.floor((p.elo || 0) / 250) + 1}</td>
+                        <td class="col-wr">${p.matches > 0 ? Math.round((p.wins / p.matches) * 100) : 0}%</td>
+                        <td class="col-elo">${p.elo || 0}</td>
+                    </tr>
+                `).join('');
+            } else {
+                podiumBox.innerHTML = '';
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:16px; color:var(--text-muted);">Раздел кланов в разработке</td></tr>`;
+            }
+        }
+    </script>
+</body>
+</html>
