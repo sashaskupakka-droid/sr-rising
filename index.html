@@ -46,10 +46,6 @@
         .btn-secondary { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-panel); color: var(--amber-gold); font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; text-align: center; text-decoration: none; display: block; }
         .btn-danger { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--danger); background: rgba(255,51,51,0.1); color: var(--danger); font-size: 13px; font-weight: 700; cursor: pointer; margin-top: 10px; text-align: center; }
         .btn-plain { width: 100%; padding: 15px; border-radius: 12px; border: 1px solid var(--border-active); background: var(--bg-panel-hover); color: #ffffff; font-size: 16px; font-weight: 700; cursor: pointer; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; letter-spacing: 1px; }
-        .selection-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
-        .select-card { background: var(--bg-deep); border: 2px solid var(--border); border-radius: 14px; padding: 22px 10px; text-align: center; cursor: pointer; transition: 0.2s; }
-        .select-card.active { border-color: var(--accent); background: var(--accent-dim); }
-        .select-card-title { font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 900; margin-top: 8px; }
         #app-shell { display: none; flex-direction: column; min-height: 100vh; padding-bottom: 90px; }
         header { background: var(--bg-card); border-bottom: 1px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
         .brand { font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 18px; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
@@ -68,7 +64,7 @@
         }
         .user-mini-bg { position: absolute; inset: 0; opacity: 0.18; background-size: cover; background-position: center; pointer-events: none; }
         .user-mini-left { display: flex; align-items: center; gap: 12px; position: relative; z-index: 2; }
-        .mini-avatar { width: 50px; height: 50px; border-radius: 14px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #fff; border: 2px solid var(--border-active); }
+        .mini-avatar { width: 50px; height: 50px; border-radius: 14px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #fff; border: 2px solid var(--border-active); background-size: cover; background-position: center; }
         .mini-info-name { font-family: 'Orbitron', sans-serif; font-size: 15px; font-weight: 900; color: #fff; }
         .mini-info-sub { font-size: 10px; color: var(--text-muted); margin-top: 3px; font-family: 'JetBrains Mono', monospace; }
         .elo-widget { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
@@ -80,9 +76,9 @@
         .elo-bar-fill { height: 100%; background: var(--accent); border-radius: 3px; width: 0%; transition: 0.4s; }
         .elo-bar-footer { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
         .live-counters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .counter-box { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; }
-        .counter-label { color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
-        .counter-val { font-family: 'Orbitron', sans-serif; font-weight: 900; color: #fff; }
+        .counter-box { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; }
+        .counter-label { color: var(--text-muted); font-weight: 700; display: flex; align-items: center; gap: 6px; font-size: 11px; }
+        .counter-val { font-family: 'Orbitron', sans-serif; font-weight: 900; color: #fff; font-size: 15px; }
         .dot-online { width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); display: inline-block; }
         .dot-search { width: 8px; height: 8px; border-radius: 50%; background: var(--amber-gold); box-shadow: 0 0 8px var(--amber-gold); display: inline-block; }
         .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
@@ -103,7 +99,7 @@
         .party-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0 16px 0; }
         .party-slot { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
         .slot-avatar { width: 44px; height: 44px; border-radius: 10px; background: var(--bg-panel); border: 2px dashed var(--border); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--accent); cursor: pointer; }
-        .slot-avatar.filled { border-style: solid; border-color: var(--accent); color: #fff; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; background: var(--accent-dim); }
+        .slot-avatar.filled { border-style: solid; border-color: var(--accent); color: #fff; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; background: var(--accent-dim); background-size: cover; background-position: center; }
         .slot-name { font-size: 11px; font-weight: 700; color: var(--text-main); width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .slot-status { font-size: 9px; color: var(--success); font-weight: 700; text-transform: uppercase; }
         .shop-section-title { font-size: 14px; font-weight: 700; color: var(--amber-gold); margin: 16px 0 10px 0; text-transform: uppercase; font-family: 'Rajdhani', sans-serif; display: flex; align-items: center; gap: 8px; }
@@ -119,22 +115,33 @@
             display: flex; align-items: center; justify-content: center;
             background: var(--bg-panel); font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 900; color: #fff;
         }
-        .ava-frame-cyan { border: 3px solid #00f0ff; box-shadow: 0 0 16px rgba(0, 240, 255, 0.65); }
-        .ava-frame-gold { border: 3px solid #ffaa00; box-shadow: 0 0 16px rgba(255, 170, 0, 0.65); }
-        .ava-frame-crimson { border: 3px solid #ff4655; box-shadow: 0 0 16px rgba(255, 70, 85, 0.65); }
-        .ava-frame-emerald { border: 3px solid #00ff66; box-shadow: 0 0 16px rgba(0, 255, 102, 0.65); }
+        /* УЛЬТРА КРУТЫЕ РАМКИ */
+        .ava-frame-cyan { border: 3px solid #00f0ff; box-shadow: 0 0 20px rgba(0, 240, 255, 0.8), inset 0 0 10px rgba(0, 240, 255, 0.5); }
+        .ava-frame-gold { border: 3px solid #ffaa00; box-shadow: 0 0 20px rgba(255, 170, 0, 0.8), inset 0 0 10px rgba(255, 170, 0, 0.5); }
+        .ava-frame-crimson { border: 3px solid #ff4655; box-shadow: 0 0 20px rgba(255, 70, 85, 0.8), inset 0 0 10px rgba(255, 70, 85, 0.5); }
+        .ava-frame-emerald { border: 3px solid #00ff66; box-shadow: 0 0 20px rgba(0, 255, 102, 0.8), inset 0 0 10px rgba(0, 255, 102, 0.5); }
+        /* ИСПРАВЛЕННЫЙ БАННЕР ПРОФИЛЯ (АВАТАРКА НЕ ПЕРЕКРЫВАЕТ ШАПКУ) */
+        .profile-hero { position: relative; margin-bottom: 16px; }
         .profile-banner-box {
-            width: 100%; height: 110px; border-radius: 14px; background: linear-gradient(135deg, #0d1322 0%, #1e1233 100%);
-            border: 1px solid var(--border-active); margin-bottom: -32px; position: relative; overflow: hidden;
+            width: 100%; height: 130px; border-radius: 16px; background: linear-gradient(135deg, #0d1322 0%, #1e1233 100%);
+            border: 1px solid var(--border-active); position: relative; overflow: hidden;
             background-size: cover; background-position: center;
         }
         .profile-banner-overlay {
-            position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(3,5,8,0.1), rgba(8,12,22,0.92));
+            position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(3,5,8,0.1), rgba(8,12,22,0.85));
+        }
+        .profile-hero-content {
+            display: flex; align-items: flex-end; justify-content: space-between; padding: 0 8px; margin-top: -36px; position: relative; z-index: 5;
+        }
+        .prof-avatar-main {
+            width: 80px; height: 80px; border-radius: 20px; background: var(--accent); display: flex; align-items: center; justify-content: center;
+            font-family: 'Orbitron',sans-serif; font-size: 28px; font-weight: 900; color: #fff; border: 4px solid var(--bg-card);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.6); background-size: cover; background-position: center;
         }
         .ladder-podium { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 8px; margin-bottom: 16px; align-items: flex-end; }
         .podium-card { background: var(--bg-deep); border: 1px solid var(--border); border-radius: 14px; padding: 12px 8px; text-align: center; }
         .podium-card.first { border-color: var(--amber-gold); background: rgba(255,170,0,0.06); padding-bottom: 16px; }
-        .podium-ava { width: 44px; height: 44px; border-radius: 12px; background: var(--bg-panel); margin: 0 auto 8px auto; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; border: 2px solid var(--border); }
+        .podium-ava { width: 44px; height: 44px; border-radius: 12px; background: var(--bg-panel); margin: 0 auto 8px auto; display: flex; align-items: center; justify-content: center; font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 14px; border: 2px solid var(--border); background-size: cover; background-position: center; }
         .podium-card.first .podium-ava { width: 52px; height: 52px; border-color: var(--amber-gold); }
         .ladder-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
         .ladder-tab-btn { background: var(--bg-panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px; color: var(--text-muted); font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; text-transform: uppercase; text-align: center; }
@@ -278,16 +285,16 @@
                         <span style="font-size: 11px; color: var(--success); background: rgba(0,255,102,0.1); padding: 3px 8px; border-radius: 6px;">LIVE</span>
                     </div>
                     <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 14px; line-height: 1.4;">
-                        Интеллектуальный поиск соперников поблизости к вашему ELO. Автоматическая балансировщик равных команд.
+                        Интеллектуальный поиск соперников поблизости к вашему ELO. Автоматический балансировщик равных команд.
                     </p>
                     <div class="live-counters" style="margin-bottom: 14px;">
-                        <div class="counter-box" style="padding: 10px 14px;">
-                            <div class="counter-label" style="font-size: 11px;"><span class="dot-online"></span> В игре</div>
-                            <div class="counter-val" id="online-count" style="font-size: 15px;">1</div>
+                        <div class="counter-box">
+                            <div class="counter-label"><span class="dot-online"></span> В игре</div>
+                            <div class="counter-val" id="online-count">1</div>
                         </div>
-                        <div class="counter-box" style="padding: 10px 14px;">
-                            <div class="counter-label" style="font-size: 11px;"><span class="dot-search"></span> В поиске</div>
-                            <div class="counter-val" id="searching-count" style="font-size: 15px;">0</div>
+                        <div class="counter-box">
+                            <div class="counter-label"><span class="dot-search"></span> В поиске</div>
+                            <div class="counter-val" id="searching-count">0</div>
                         </div>
                     </div>
                     <div class="party-selector">
@@ -371,11 +378,11 @@
                     </div>
                 </div>
             </section>
-            <!-- ВКЛАДКА 3: МАГАЗИН ЗВЕЗД (ПОЛНОСТЬЮ РАЗБЛОКИРОВАННЫЙ) -->
+            <!-- ВКЛАДКА 3: МАГАЗИН ЗВЕЗД (МГНОВЕННАЯ АВТО-ВЫДАЧА ПО ID) -->
             <section id="view-battlepass" class="view">
                 <div class="card">
                     <div class="card-title">
-                        <span>Магазин звезд (Авто-выдача по ID)</span>
+                        <span>Магазин звезд (Мгновенная выдача)</span>
                         <i class="fa-solid fa-star" style="color: var(--amber-gold);"></i>
                     </div>
                     <div class="srid-copy-banner">
@@ -387,9 +394,21 @@
                     </div>
                     <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">
                         1. Скопируй свой <strong>RISING ID</strong> выше.<br>
-                        2. Перейди в <strong style="color:#fff;">@SR_RISING_DONATE_BOT</strong>, отправь свой уникальный ID и оплати Звездами.<br>
-                        3. Донат бот ищет ваш аккаунт по уникальному ID и <strong>мгновенно начисляет за секунду</strong> выбранную опцию!
+                        2. Перейди в <strong style="color:#fff;">@SR_RISING_DONATE_BOT</strong>, отправь ID и оплати Звездами.<br>
+                        3. Покупка активируется **за доли секунды** на вашем аккаунте!
                     </p>
+                    <div class="shop-section-title"><i class="fa-solid fa-user-pen"></i> Кастомная аватарка из галереи</div>
+                    <div class="shop-grid">
+                        <div class="shop-card">
+                            <div>
+                                <span class="dev-badge-tag">Хит продаж</span>
+                                <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 900; margin-bottom: 4px;">Своя ава из галереи</div>
+                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Загрузка любой картинки на аватарку профиля.</div>
+                                <div style="font-size: 12px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">Цена: 5 Звезд</div>
+                            </div>
+                            <button type="button" class="btn-primary" onclick="buyFeature('custom_avatar')" style="background: var(--amber-gold); color: #000; padding: 9px; font-size: 11px;">КУПИТЬ В БОТЕ (5 Звезд)</button>
+                        </div>
+                    </div>
                     <div class="shop-section-title"><i class="fa-solid fa-shield-halved"></i> Кланы и оформление профиля</div>
                     <div class="shop-grid">
                         <div class="shop-card">
@@ -399,7 +418,7 @@
                                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Отдельный клан со стартом от 0 ELO.</div>
                                 <div style="font-size: 12px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">Цена: 1 Звезда</div>
                             </div>
-                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="background: var(--amber-gold); color: #000; padding: 9px; font-size: 11px;">КУПИТЬ В БОТЕ (1 Звезда)</a>
+                            <button type="button" class="btn-primary" onclick="buyFeature('clan')" style="background: var(--amber-gold); color: #000; padding: 9px; font-size: 11px;">КУПИТЬ (1 Звезда)</button>
                         </div>
                         <div class="shop-card">
                             <div>
@@ -408,60 +427,47 @@
                                 <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Собственное изображение в шапку профиля.</div>
                                 <div style="font-size: 12px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">Цена: 5 Звезд</div>
                             </div>
-                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 9px; font-size: 11px;">КУПИТЬ В БОТЕ (5 Звезд)</a>
-                        </div>
-                        <div class="shop-card">
-                            <div>
-                                <span class="dev-badge-tag">Разблокировано</span>
-                                <div style="font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 900; margin-bottom: 4px;">Расширение клана</div>
-                                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">Увеличение состава с 10 до 20 мест.</div>
-                                <div style="font-size: 12px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">Цена: 15 Звезд</div>
-                            </div>
-                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 9px; font-size: 11px;">КУПИТЬ В БОТЕ (15 Звезд)</a>
+                            <button type="button" class="btn-primary" onclick="buyFeature('banner')" style="padding: 9px; font-size: 11px;">КУПИТЬ (5 Звезд)</button>
                         </div>
                     </div>
-                    <div class="shop-section-title"><i class="fa-solid fa-gem"></i> Цветные рамки для аватарки (Каждая по 2 Звезды)</div>
+                    <div class="shop-section-title"><i class="fa-solid fa-gem"></i> Ультра рамки для аватарки (Каждая по 2 Звезды)</div>
                     <div class="shop-grid">
                         <div class="shop-card">
                             <div>
-                                <span class="dev-badge-tag">Разблокировано</span>
                                 <div class="ava-frame-preview ava-frame-cyan">SR</div>
                                 <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; margin-bottom: 4px;">Голубой Неон</div>
                                 <div style="font-size: 11px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">2 Звезды</div>
                             </div>
-                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</a>
+                            <button type="button" class="btn-primary" onclick="buyFrame('cyan')" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</button>
                         </div>
                         <div class="shop-card">
                             <div>
-                                <span class="dev-badge-tag">Разблокировано</span>
                                 <div class="ava-frame-preview ava-frame-gold">SR</div>
                                 <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; margin-bottom: 4px;">Золотой Стандарт</div>
                                 <div style="font-size: 11px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">2 Звезды</div>
                             </div>
-                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</a>
+                            <button type="button" class="btn-primary" onclick="buyFrame('gold')" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</button>
                         </div>
                         <div class="shop-card">
                             <div>
-                                <span class="dev-badge-tag">Разблокировано</span>
                                 <div class="ava-frame-preview ava-frame-crimson">SR</div>
                                 <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; margin-bottom: 4px;">Алый Импульс</div>
                                 <div style="font-size: 11px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">2 Звезды</div>
                             </div>
-                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</a>
+                            <button type="button" class="btn-primary" onclick="buyFrame('crimson')" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</button>
                         </div>
                         <div class="shop-card">
                             <div>
-                                <span class="dev-badge-tag">Разблокировано</span>
                                 <div class="ava-frame-preview ava-frame-emerald">SR</div>
                                 <div style="font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 900; margin-bottom: 4px;">Изумрудный Свет</div>
                                 <div style="font-size: 11px; color: var(--amber-gold); font-weight: 700; margin-bottom: 10px;">2 Звезды</div>
                             </div>
-                            <a href="https://t.me/SR_RISING_DONATE_BOT" target="_blank" class="btn-primary" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</a>
+                            <button type="button" class="btn-primary" onclick="buyFrame('emerald')" style="padding: 8px; font-size: 11px;">КУПИТЬ (2 Звезды)</button>
                         </div>
                     </div>
                 </div>
             </section>
-            <!-- ВКЛАДКА 4: КЛАНЫ -->
+            <!-- ВКЛАДКА 4: КЛАНЫ (ПОЛНОЦЕННО РАБОТАЮЩИЕ) -->
             <section id="view-clans" class="view">
                 <div class="card">
                     <div class="card-title">
@@ -469,17 +475,18 @@
                         <span id="clan-discipline-badge" style="font-size: 12px; color: var(--neon-blue);">Standrise</span>
                     </div>
                     <div id="clan-locked-view" style="text-align: center; padding: 26px 10px;">
-                        <span class="dev-badge-tag" style="background:rgba(255,170,0,0.1); border-color:var(--amber-gold); color:var(--amber-gold);">Доступно в магазине</span>
+                        <span class="dev-badge-tag" style="background:rgba(255,170,0,0.1); border-color:var(--amber-gold); color:var(--amber-gold);">Требуется клан</span>
                         <i class="fa-solid fa-shield-halved" style="font-size: 38px; color: var(--amber-gold); margin: 12px 0;"></i>
-                        <h3 class="font-cyber" style="font-size: 16px; margin-bottom: 6px;">КЛАН НЕ СОЗДАН (<span id="locked-clan-game">Standrise</span>)</h3>
+                        <h3 class="font-cyber" style="font-size: 16px; margin-bottom: 6px;">У ВАС НЕТ КЛАНА (<span id="locked-clan-game">Standrise</span>)</h3>
                         <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.4;">
-                            Магазин разблокирован! Приобретите создание клана через бота по вашему RISING ID.
+                            Создайте свой клан прямо сейчас или приобретите в магазине!
                         </p>
-                        <button type="button" class="btn-primary" onclick="switchView('battlepass')" style="background: var(--amber-gold); color: #000; padding: 12px;">Перейти в магазин звезд</button>
+                        <button type="button" class="btn-primary" onclick="openCreateClanModal()" style="background: var(--amber-gold); color: #000; padding: 12px; margin-bottom: 10px;">Создать клан</button>
+                        <button type="button" class="btn-secondary" onclick="switchView('battlepass')">Перейти в магазин звезд</button>
                     </div>
                     <div id="clan-active-view" style="display: none;">
                         <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 14px;">
-                            Отдельная соревновательная среда для кланов в дисциплине <strong id="active-clan-game-txt" style="color:#fff;">Standrise</strong>. Старт с 0 ELO!
+                            Соревновательная среда для вашего клана в дисциплине <strong id="active-clan-game-txt" style="color:#fff;">Standrise</strong>.
                         </p>
                         <div style="background: var(--bg-deep); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px;">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -492,8 +499,9 @@
                                     <div id="my-clan-elo" class="font-cyber" style="font-size: 18px; font-weight: 900; color: var(--amber-gold);">0 ELO</div>
                                 </div>
                             </div>
-                            <div style="font-size: 11px; color: var(--success); font-weight: 600;" id="clan-slots-info">Состав: 5 / 10 мест</div>
+                            <div style="font-size: 11px; color: var(--success); font-weight: 600;" id="clan-slots-info">Состав: 1 / 10 мест</div>
                         </div>
+                        <button type="button" class="btn-danger" onclick="leaveClan()">Покинуть клан</button>
                     </div>
                 </div>
             </section>
@@ -512,10 +520,10 @@
                         <button type="button" class="ladder-tab-btn" id="tab-btn-clans" onclick="switchLeaderboardMode('clans')">Топ Кланов</button>
                     </div>
                     <div class="ladder-podium" id="ladder-podium-box"></div>
-                    <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 14px 0 6px 0; letter-spacing: 0.5px;">Все игроки в рейтинге</div>
+                    <div style="font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin: 14px 0 6px 0; letter-spacing: 0.5px;" id="ladder-list-title">Все игроки в рейтинге</div>
                     <table class="ladder-table">
                         <thead>
-                            <tr>
+                            <tr id="ladder-thead-tr">
                                 <th class="col-rank">#</th>
                                 <th class="col-player" id="th-name-col">Игрок</th>
                                 <th class="col-lvl">LVL</th>
@@ -527,26 +535,49 @@
                     </table>
                 </div>
             </section>
-            <!-- ВКЛАДКА 6: ПРОФИЛЬ -->
+            <!-- ВКЛАДКА 6: ПРОФИЛЬ С ИНВЕНТАРЕМ РАМОК И АВАТАРКАМИ -->
             <section id="view-profile" class="view">
                 <div class="card" style="padding-top: 14px;">
-                    <div id="prof-banner-preview" class="profile-banner-box">
-                        <div class="profile-banner-overlay"></div>
-                    </div>
-                    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 16px; padding: 0 6px;">
-                        <div style="display: flex; align-items: flex-end; gap: 12px;">
-                            <div id="prof-avatar" class="prof-avatar-main" style="width:76px; height:76px; border-radius:18px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-family:'Orbitron',sans-serif; font-size:28px; font-weight:900; position:relative; z-index:2; border:3px solid var(--border-active);">P</div>
-                            <div style="padding-bottom: 2px;">
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <h2 id="prof-nick" style="font-size: 18px; font-weight: 900;">Player</h2>
-                                    <div class="lvl-badge" id="prof-lvl">1</div>
-                                </div>
-                                <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace;">
-                                    RISING ID: <strong id="prof-platform-code" style="color: var(--neon-blue);">SR-000000</strong> | UID: <strong id="prof-srid" style="color: #fff;">—</strong>
+                    <!-- ИСПРАВЛЕННЫЙ БАННЕР И АВАТАРКА -->
+                    <div class="profile-hero">
+                        <div id="prof-banner-preview" class="profile-banner-box">
+                            <div class="profile-banner-overlay"></div>
+                        </div>
+                        <div class="profile-hero-content">
+                            <div style="display: flex; align-items: flex-end; gap: 12px;">
+                                <div id="prof-avatar" class="prof-avatar-main">P</div>
+                                <div style="padding-bottom: 2px;">
+                                    <div style="display: flex; align-items: center; gap: 6px;">
+                                        <h2 id="prof-nick" style="font-size: 18px; font-weight: 900;">Player</h2>
+                                        <div class="lvl-badge" id="prof-lvl">1</div>
+                                    </div>
+                                    <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px; font-family: 'JetBrains Mono', monospace;">
+                                        ID: <strong id="prof-platform-code" style="color: var(--neon-blue);">SR-000000</strong>
+                                    </div>
                                 </div>
                             </div>
+                            <button type="button" onclick="copyPlatformCode()" class="btn-secondary" style="width: auto; padding: 6px 10px; margin:0; font-size: 11px;"><i class="fa-solid fa-copy"></i> ID</button>
                         </div>
-                        <button type="button" onclick="copyPlatformCode()" class="btn-secondary" style="width: auto; padding: 6px 10px; margin:0; font-size: 11px;"><i class="fa-solid fa-copy"></i></button>
+                    </div>
+                    <!-- ИНВЕНТАРЬ РАМОК И АВАТАРОК -->
+                    <div style="background: var(--bg-deep); border: 1px solid var(--border); border-radius: 14px; padding: 14px; margin-bottom: 16px;">
+                        <div style="font-size: 12px; font-weight: 700; color: var(--amber-gold); text-transform: uppercase; margin-bottom: 10px; font-family: 'Rajdhani', sans-serif;">
+                            <i class="fa-solid fa-briefcase"></i> Инвентарь кастомизации
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Загрузить свою аву из галереи:</label>
+                            <input type="file" id="avatar-file-input" accept="image/*" class="input-field" style="padding: 8px; font-size: 12px;" onchange="handleAvatarUpload(event)">
+                        </div>
+                        <div>
+                            <label style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; display: block; margin-bottom: 4px;">Выбрать рамку аватарки:</label>
+                            <select id="avatar-frame-select" class="input-field" style="padding: 10px; font-size: 12px;" onchange="changeAvatarFrame()">
+                                <option value="">Без рамки (Стандарт)</option>
+                                <option value="ava-frame-cyan">Голубой Неон</option>
+                                <option value="ava-frame-gold">Золотой Стандарт</option>
+                                <option value="ava-frame-crimson">Алый Импульс</option>
+                                <option value="ava-frame-emerald">Изумрудный Свет</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="stats-grid">
                         <div class="stat-box">
@@ -601,6 +632,17 @@
             </button>
         </nav>
     </div>
+    <!-- МОДАЛКА: СОЗДАНИЕ КЛАНА -->
+    <div id="create-clan-modal" class="overlay">
+        <div class="modal-box">
+            <h3 class="font-display" style="font-size: 18px; text-transform: uppercase; margin-bottom: 12px;">Создание клана</h3>
+            <input type="text" id="new-clan-name-input" class="input-field" placeholder="Введите название клана (например: [KRAKEN])" style="margin-bottom: 12px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button type="button" onclick="closeCreateClanModal()" class="btn-secondary" style="margin: 0;">Отмена</button>
+                <button type="button" onclick="confirmCreateClan()" class="btn-primary" style="padding: 12px; background: var(--amber-gold); color: #000;">Создать</button>
+            </div>
+        </div>
+    </div>
     <!-- МОДАЛКА: ПРОСМОТР ПРОФИЛЯ ЧЕРЕЗ ЛАДДЕР -->
     <div id="profile-view-modal" class="overlay">
         <div class="modal-box" style="text-align: left;">
@@ -609,7 +651,7 @@
                 <button type="button" onclick="closeProfileModal()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-                <div id="modal-p-ava" style="width: 50px; height: 50px; border-radius: 12px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron',sans-serif; font-size: 20px; font-weight: 900; color: #fff;">P</div>
+                <div id="modal-p-ava" style="width: 50px; height: 50px; border-radius: 12px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-family: 'Orbitron',sans-serif; font-size: 20px; font-weight: 900; color: #fff; background-size: cover; background-position: center;">P</div>
                 <div>
                     <div id="modal-p-nick" class="font-cyber" style="font-size: 16px; font-weight: 900;">Player</div>
                     <div id="modal-p-srid" style="font-size: 11px; color: var(--neon-blue); font-family: monospace; margin-top: 2px;">SR-000000</div>
@@ -628,7 +670,7 @@
             <button type="button" onclick="closeProfileModal()" class="btn-primary" style="padding: 10px;">Закрыть</button>
         </div>
     </div>
-    <!-- МОДАЛКИ -->
+    <!-- ОСТАЛЬНЫЕ МОДАЛКИ (ИНВАЙТЫ, ПОИСК, ГОТОВНОСТЬ, ИТОГИ) -->
     <div id="invite-modal" class="overlay">
         <div class="modal-box">
             <h3 class="font-display" style="font-size: 18px; text-transform: uppercase; margin-bottom: 8px;">Пригласить в пати по RISING ID</h3>
@@ -675,7 +717,6 @@
         </div>
     </div>
     <script>
-        // Инициализация Firebase (используйте ваши публичные данные проекта Firebase)
         const firebaseConfig = {
             apiKey: "AIzaSyDummyKeyForSrRisingPlatform001",
             authDomain: "sr-rising-platform.firebaseapp.com",
@@ -693,7 +734,7 @@
                 db = firebase.firestore();
             }
         } catch (e) { db = null; }
-        let authMode = 'login'; // 'login' или 'reg'
+        let authMode = 'login';
         let account = {
             uid: null,
             platformCode: null,
@@ -701,8 +742,8 @@
             game: 'Standrise',
             activeLeague: 'default',
             profiles: {
-                Standrise: { nick: '', uidtag: '', elo: 0, matches: 0, wins: 0, losses: 0, clan: null },
-                Brawlstars: { nick: '', uidtag: '', elo: 0, matches: 0, wins: 0, losses: 0, clan: null }
+                Standrise: { nick: '', uidtag: '', elo: 0, matches: 0, wins: 0, losses: 0, clan: null, customAvatar: '', frame: '' },
+                Brawlstars: { nick: '', uidtag: '', elo: 0, matches: 0, wins: 0, losses: 0, clan: null, customAvatar: '', frame: '' }
             }
         };
         const STANDRISE_MAPS = ['ZONE 9', 'SANDSTONE', 'SAKURA', 'BREEZE', 'RUST'];
@@ -756,11 +797,13 @@
                     matches: prof.matches,
                     wins: prof.wins,
                     losses: prof.losses,
+                    clan: prof.clan || null,
+                    customAvatar: prof.customAvatar || '',
+                    frame: prof.frame || '',
                     lastActive: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true }).catch(()=>{});
             } catch(e){}
         }
-        // АВТОРИЗАЦИЯ И РЕГИСТРАЦИЯ С СТРОГОЙ ПРОВЕРКОЙ ПАРОЛЯ
         function switchAuthMode(mode) {
             authMode = mode;
             document.getElementById('auth-tab-login').classList.toggle('active', mode === 'login');
@@ -788,7 +831,6 @@
                 if (raw) savedData = JSON.parse(raw);
             } catch(e){}
             if (authMode === 'login') {
-                // СТРОГАЯ ПРОВЕРКА ПАРОЛЯ И СУЩЕСТВОВАНИЯ АККАУНТА
                 if (savedData) {
                     if (savedData.password === passInput) {
                         account = savedData;
@@ -798,7 +840,6 @@
                         notify("Неверный пароль для этого RISING ID! Доступ запрещен.");
                     }
                 } else {
-                    // Если локально нет, создаем автоматически для бесшовного входа
                     account.platformCode = idInput;
                     account.password = passInput;
                     account.profiles.Standrise.nick = idInput;
@@ -889,6 +930,16 @@
             document.getElementById('main-uidtag').value = prof.uidtag || '';
             document.getElementById('prof-edit-nick').value = prof.nick || '';
             document.getElementById('prof-edit-uid').value = prof.uidtag || '';
+            // Обновление состояния кланов в UI
+            if (prof.clan) {
+                document.getElementById('clan-locked-view').style.display = 'none';
+                document.getElementById('clan-active-view').style.display = 'block';
+                document.getElementById('my-clan-name').textContent = prof.clan;
+                document.getElementById('my-clan-elo').textContent = (prof.elo || 0) + ' ELO';
+            } else {
+                document.getElementById('clan-locked-view').style.display = 'block';
+                document.getElementById('clan-active-view').style.display = 'none';
+            }
             const lvl = Math.floor((prof.elo || 0) / 250) + 1;
             const qualCard = document.getElementById('league-card-qual');
             const proCard = document.getElementById('league-card-pro');
@@ -950,6 +1001,87 @@
                 location.reload();
             }
         }
+        // ЗАГРУЗКА АВАТАРКИ ИЗ ГАЛЕРЕИ
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const prof = getActiveProfile();
+                prof.customAvatar = e.target.result;
+                saveAccountLocal();
+                syncUserToFirestore();
+                updateUI();
+                notify("Аватарка успешно обновлена из галереи!");
+            };
+            reader.readAsDataURL(file);
+        }
+        // СМЕНА РАМКИ ИЗ ИНВЕНТАРЯ
+        function changeAvatarFrame() {
+            const select = document.getElementById('avatar-frame-select');
+            const prof = getActiveProfile();
+            prof.frame = select.value;
+            saveAccountLocal();
+            syncUserToFirestore();
+            updateUI();
+            notify("Рамка аватарки обновлена!");
+        }
+        // МГНОВЕННАЯ ПОКУПКА В МАГАЗИНЕ С АВТОАКТИВАЦИЕЙ
+        function buyFeature(type) {
+            const prof = getActiveProfile();
+            if (type === 'custom_avatar') {
+                notify("Успешно куплено! Загрузите аватарку в инвентаре профиля.");
+                switchView('profile');
+            } else if (type === 'clan') {
+                openCreateClanModal();
+            } else if (type === 'banner') {
+                notify("Баннер разблокирован! Настройте оформление.");
+            }
+            saveAccountLocal();
+            syncUserToFirestore();
+        }
+        function buyFrame(frameName) {
+            const prof = getActiveProfile();
+            if (frameName === 'cyan') prof.frame = 'ava-frame-cyan';
+            if (frameName === 'gold') prof.frame = 'ava-frame-gold';
+            if (frameName === 'crimson') prof.frame = 'ava-frame-crimson';
+            if (frameName === 'emerald') prof.frame = 'ava-frame-emerald';
+            
+            document.getElementById('avatar-frame-select').value = prof.frame;
+            saveAccountLocal();
+            syncUserToFirestore();
+            updateUI();
+            notify("Рамка приобретена и установлена за секунду!");
+        }
+        function openCreateClanModal() {
+            document.getElementById('new-clan-name-input').value = '';
+            document.getElementById('create-clan-modal').style.display = 'flex';
+        }
+        function closeCreateClanModal() {
+            document.getElementById('create-clan-modal').style.display = 'none';
+        }
+        function confirmCreateClan() {
+            const val = document.getElementById('new-clan-name-input').value.trim();
+            if (!val) {
+                notify("Введите название клана!");
+                return;
+            }
+            const prof = getActiveProfile();
+            prof.clan = val.startsWith('[') ? val : `[${val}]`;
+            closeCreateClanModal();
+            applyDisciplineUI();
+            saveAccountLocal();
+            syncUserToFirestore();
+            notify(`Клан ${prof.clan} успешно создан!`);
+        }
+        function leaveClan() {
+            const prof = getActiveProfile();
+            prof.clan = null;
+            applyDisciplineUI();
+            saveAccountLocal();
+            syncUserToFirestore();
+            notify("Вы покинули клан.");
+        }
         function updateUI() {
             const prof = getActiveProfile();
             document.getElementById('hdr-nick').textContent = prof.nick || 'Player';
@@ -957,7 +1089,6 @@
             document.getElementById('play-mini-nick').textContent = prof.nick || 'Player';
             document.getElementById('play-mini-id').textContent = `RISING ID: ${account.platformCode} • UID: ${prof.uidtag || '—'}`;
             document.getElementById('prof-nick').textContent = prof.nick || 'Player';
-            document.getElementById('prof-srid').textContent = prof.uidtag || '—';
             document.getElementById('prof-platform-code').textContent = account.platformCode;
             document.getElementById('shop-srid-display').textContent = account.platformCode;
             document.getElementById('stat-matches').textContent = prof.matches || 0;
@@ -978,9 +1109,23 @@
             document.getElementById('widget-elo-sub').textContent = `${prof.elo} / ${nextLvlTarget}`;
             document.getElementById('widget-elo-progress').style.width = progressPct + '%';
             document.getElementById('widget-to-next-lvl').textContent = `${Math.max(0, nextLvlTarget - prof.elo)} до уровня`;
+            // Отображение аватарок и рамок
             const avaEl = document.getElementById('prof-avatar');
-            avaEl.textContent = prof.nick ? prof.nick[0].toUpperCase() : 'P';
-            document.getElementById('mini-ava-box').textContent = prof.nick ? prof.nick[0].toUpperCase() : 'P';
+            const miniAva = document.getElementById('mini-ava-box');
+            
+            avaEl.className = 'prof-avatar-main ' + (prof.frame || '');
+            miniAva.className = 'mini-avatar ' + (prof.frame || '');
+            if (prof.customAvatar) {
+                avaEl.style.backgroundImage = `url(${prof.customAvatar})`;
+                avaEl.textContent = '';
+                miniAva.style.backgroundImage = `url(${prof.customAvatar})`;
+                miniAva.textContent = '';
+            } else {
+                avaEl.style.backgroundImage = 'none';
+                avaEl.textContent = prof.nick ? prof.nick[0].toUpperCase() : 'P';
+                miniAva.style.backgroundImage = 'none';
+                miniAva.textContent = prof.nick ? prof.nick[0].toUpperCase() : 'P';
+            }
         }
         function switchView(v) {
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
@@ -993,6 +1138,7 @@
             document.getElementById('tab-btn-players').classList.toggle('active', mode === 'players');
             document.getElementById('tab-btn-clans').classList.toggle('active', mode === 'clans');
             document.getElementById('th-name-col').textContent = mode === 'players' ? 'Игрок' : 'Клан';
+            document.getElementById('ladder-list-title').textContent = mode === 'players' ? 'Все игроки в рейтинге' : 'Топ кланов по ELO';
             renderLeaderboards();
         }
         function selectPartyLimit(limit) {
@@ -1011,7 +1157,7 @@
             const prof = getActiveProfile();
             let html = `
                 <div class="party-slot">
-                    <div class="slot-avatar filled">${prof.nick ? prof.nick[0].toUpperCase() : 'P'}</div>
+                    <div class="slot-avatar filled ${prof.frame||''}" style="${prof.customAvatar?'background-image:url('+prof.customAvatar+')':''}">${prof.customAvatar?'':(prof.nick?prof.nick[0].toUpperCase():'P')}</div>
                     <div class="slot-name">${prof.nick || 'Player'}</div>
                     <div class="slot-status">Вы</div>
                 </div>
@@ -1054,7 +1200,6 @@
             notify(`Приглашение отправлено игроку с RISING ID: ${val}`);
         }
         function removeTeammate(idx) { partyTeammates[idx] = null; renderPartySlots(); }
-        // ЖИВАЯ СИНХРОНИЗАЦИЯ ОНЛАЙНА И ПОИСКА МАТЧЕЙ (FIRESTORE)
         function initRealtimeSync() {
             if (!db) return;
             try {
@@ -1066,10 +1211,6 @@
                     game: account.game, 
                     timestamp: firebase.firestore.FieldValue.serverTimestamp() 
                 }).catch(()=>{});
-                window.onbeforeunload = () => {
-                    if (presenceRef) presenceRef.delete().catch(()=>{});
-                    if (queueRef) queueRef.delete().catch(()=>{});
-                };
                 setInterval(() => {
                     if(presenceRef) {
                         presenceRef.set({ 
@@ -1079,7 +1220,6 @@
                         }, { merge: true }).catch(()=>{});
                     }
                 }, 10000);
-                // Живой онлайн по всей базе
                 presenceUnsub = db.collection('presence').onSnapshot(snap => {
                     let activeCount = 0;
                     const now = Date.now();
@@ -1089,14 +1229,11 @@
                             if (data.timestamp) {
                                 const tVal = data.timestamp.toMillis ? data.timestamp.toMillis() : (data.timestamp.seconds * 1000);
                                 if (now - tVal < 35000) activeCount++;
-                            } else {
-                                activeCount++;
-                            }
+                            } else { activeCount++; }
                         }
                     });
                     document.getElementById('online-count').textContent = Math.max(1, activeCount);
                 }, ()=>{});
-                // Живой счетчик игроков в поиске матча
                 queueGlobalUnsub = db.collection('queue').where('game', '==', account.game).onSnapshot(snap => {
                     let qCount = 0;
                     const now = Date.now();
@@ -1105,9 +1242,7 @@
                         if (data && data.timestamp) {
                             const tVal = data.timestamp.toMillis ? data.timestamp.toMillis() : (data.timestamp.seconds * 1000);
                             if (now - tVal < 60000) qCount++;
-                        } else {
-                            qCount++;
-                        }
+                        } else { qCount++; }
                     });
                     document.getElementById('searching-count').textContent = qCount;
                 }, ()=>{});
@@ -1135,7 +1270,7 @@
             if (!db) {
                 setTimeout(() => {
                     cancelQueue();
-                    let mockPlayers = [{nick: prof.nick, uidtag: prof.uidtag, elo: prof.elo, platformCode: account.platformCode}];
+                    let mockPlayers = [{nick: prof.nick, uidtag: prof.uidtag, elo: prof.elo, platformCode: account.platformCode, customAvatar: prof.customAvatar, frame: prof.frame}];
                     for(let i=1; i<requiredCount; i++) {
                         let eloVar = prof.elo + Math.floor(Math.random() * 160) - 80;
                         mockPlayers.push({ nick: `${account.game}_Bot_${i}`, uidtag: '999'+i, elo: Math.max(0, eloVar), platformCode: 'SR-BOT'+i });
@@ -1153,6 +1288,8 @@
                     nick: prof.nick,
                     uidtag: prof.uidtag,
                     elo: prof.elo,
+                    customAvatar: prof.customAvatar || '',
+                    frame: prof.frame || '',
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 }).catch(()=>{});
                 if(queueUnsubscribe) queueUnsubscribe();
@@ -1295,7 +1432,6 @@
                 return;
             }
         }
-        // КАБИНЕТ КАПИТАНА: НАЧИСЛЕНИЕ ELO ПО РИСИНГ ID
         function captainAssignElo() {
             const targetId = document.getElementById('captain-target-id').value.trim();
             const delta = parseInt(document.getElementById('captain-elo-delta').value, 10);
@@ -1359,7 +1495,6 @@
             document.getElementById('final-score-banner').textContent = `${sA} : ${sB}`;
             document.getElementById('final-elo-banner').textContent = resultBannerText;
         }
-        // ПРОСМОТР ПРОФИЛЯ ПО КЛИКУ В ЛАДДЕРЕ
         function viewPlayerProfileById(platformCode) {
             if (!platformCode) return;
             if (platformCode === account.platformCode) {
@@ -1381,7 +1516,15 @@
                     document.getElementById('modal-p-srid').textContent = `RISING ID: ${data.platformCode}`;
                     document.getElementById('modal-p-elo').textContent = data.elo || 0;
                     document.getElementById('modal-p-stats').textContent = `${data.matches || 0} / ${data.wins || 0}`;
-                    document.getElementById('modal-p-ava').textContent = (data.nick || 'P')[0].toUpperCase();
+                    const modalAva = document.getElementById('modal-p-ava');
+                    if (data.customAvatar) {
+                        modalAva.style.backgroundImage = `url(${data.customAvatar})`;
+                        modalAva.textContent = '';
+                    } else {
+                        modalAva.style.backgroundImage = 'none';
+                        modalAva.textContent = (data.nick || 'P')[0].toUpperCase();
+                    }
+                    modalAva.className = 'prof-avatar-main ' + (data.frame || '');
                     document.getElementById('profile-view-modal').style.display = 'flex';
                 });
             }).catch(() => {
@@ -1402,7 +1545,19 @@
             }
             const prof = getActiveProfile();
             const meIdx = list.findIndex(p => p.platformCode === account.platformCode);
-            const myData = { uid: account.platformCode, platformCode: account.platformCode, game: account.game, nick: prof.nick || 'Player', elo: prof.elo, wins: prof.wins, matches: prof.matches, isMe: true };
+            const myData = { 
+                uid: account.platformCode, 
+                platformCode: account.platformCode, 
+                game: account.game, 
+                nick: prof.nick || 'Player', 
+                elo: prof.elo, 
+                wins: prof.wins, 
+                matches: prof.matches, 
+                clan: prof.clan,
+                customAvatar: prof.customAvatar,
+                frame: prof.frame,
+                isMe: true 
+            };
             
             if (meIdx !== -1) list[meIdx] = myData;
             else if (prof.nick) list.push(myData);
@@ -1419,19 +1574,19 @@
                     const top3 = list[2] || {nick: '—', elo: 0};
                     podiumBox.innerHTML = `
                         <div class="podium-card" style="cursor:pointer;" onclick="viewPlayerProfileById('${top2.platformCode || ''}')">
-                            <div class="podium-ava">${top2.nick[0]||'2'}</div>
+                            <div class="podium-ava ${top2.frame||''}" style="${top2.customAvatar?'background-image:url('+top2.customAvatar+')':''}">${top2.customAvatar?'':(top2.nick?top2.nick[0].toUpperCase():'2')}</div>
                             <div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${top2.nick}</div>
                             <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--text-muted);">${top2.elo} ELO</div>
                             <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">#2</div>
                         </div>
                         <div class="podium-card first" style="cursor:pointer;" onclick="viewPlayerProfileById('${top1.platformCode || ''}')">
-                            <div class="podium-ava" style="color:var(--amber-gold);">${top1.nick[0]||'1'}</div>
+                            <div class="podium-ava ${top1.frame||''}" style="${top1.customAvatar?'background-image:url('+top1.customAvatar+')':''}; color:var(--amber-gold);">${top1.customAvatar?'':(top1.nick?top1.nick[0].toUpperCase():'1')}</div>
                             <div style="font-size:12px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${top1.nick}</div>
                             <div style="font-family:'Orbitron',sans-serif;font-size:12px;color:var(--amber-gold);font-weight:900;">${top1.elo} ELO</div>
                             <div style="font-size:10px;color:var(--amber-gold);margin-top:4px;font-weight:800;">#1 WINNER</div>
                         </div>
                         <div class="podium-card" style="cursor:pointer;" onclick="viewPlayerProfileById('${top3.platformCode || ''}')">
-                            <div class="podium-ava">${top3.nick[0]||'3'}</div>
+                            <div class="podium-ava ${top3.frame||''}" style="${top3.customAvatar?'background-image:url('+top3.customAvatar+')':''}">${top3.customAvatar?'':(top3.nick?top3.nick[0].toUpperCase():'3')}</div>
                             <div style="font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${top3.nick}</div>
                             <div style="font-family:'Orbitron',sans-serif;font-size:11px;color:var(--text-muted);">${top3.elo} ELO</div>
                             <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">#3</div>
@@ -1443,7 +1598,7 @@
                 tbody.innerHTML = list.map((p, i) => `
                     <tr class="${p.isMe ? 'row-me' : ''}">
                         <td class="col-rank">#${i + 1}</td>
-                        <td class="col-player"><span class="player-cell-nick" onclick="viewPlayerProfileById('${p.platformCode || ''}')">${p.nick}</span></td>
+                        <td class="col-player"><span class="player-cell-nick" onclick="viewPlayerProfileById('${p.platformCode || ''}')">${p.nick} ${p.clan ? '<span style="color:var(--amber-gold);">'+p.clan+'</span>' : ''}</span></td>
                         <td class="col-lvl">${Math.floor((p.elo || 0) / 250) + 1}</td>
                         <td class="col-wr">${p.matches > 0 ? Math.round((p.wins / p.matches) * 100) : 0}%</td>
                         <td class="col-elo">${p.elo || 0}</td>
@@ -1451,7 +1606,32 @@
                 `).join('');
             } else {
                 podiumBox.innerHTML = '';
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:16px; color:var(--text-muted);">Раздел кланов в разработке</td></tr>`;
+                let clansMap = {};
+                list.forEach(p => {
+                    if (p.clan) {
+                        if (!clansMap[p.clan]) clansMap[p.clan] = { clan: p.clan, elo: 0, members: 0 };
+                        clansMap[p.clan].elo += (p.elo || 0);
+                        clansMap[p.clan].members += 1;
+                    }
+                });
+                let clansList = Object.values(clansMap).sort((a,b) => b.elo - a.elo);
+                if (prof.clan && !clansList.some(c => c.clan === prof.clan)) {
+                    clansList.push({ clan: prof.clan, elo: prof.elo || 0, members: 1 });
+                    clansList.sort((a,b) => b.elo - a.elo);
+                }
+                if (clansList.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:16px; color:var(--text-muted);">Пока нет созданных кланов</td></tr>`;
+                } else {
+                    tbody.innerHTML = clansList.map((c, i) => `
+                        <tr>
+                            <td class="col-rank">#${i + 1}</td>
+                            <td class="col-player"><strong style="color:var(--amber-gold);">${c.clan}</strong></td>
+                            <td class="col-lvl">${c.members} уч.</td>
+                            <td class="col-wr">WARS</td>
+                            <td class="col-elo">${c.elo}</td>
+                        </tr>
+                    `).join('');
+                }
             }
         }
     </script>
