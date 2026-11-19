@@ -13,23 +13,23 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
         :root {
-            --bg-void: #070609;
-            --bg-surface: #0e0b10;
-            --bg-elevated: #141018;
-            --bg-hover: #1b1521;
+            --bg-void: #070608;
+            --bg-surface: #0f0d12;
+            --bg-elevated: #17141c;
+            --bg-hover: #201c27;
             --rose-crimson: #e11d48;
-            --rose-bright: #f43f5e;
-            --rose-glow: rgba(225, 29, 72, 0.35);
-            --emerald-neon: #10b981;
-            --emerald-glow: rgba(16, 185, 129, 0.35);
+            --rose-bright: #ff2e63;
+            --rose-glow: rgba(255, 46, 99, 0.34);
+            --emerald-neon: #16c784;
+            --emerald-glow: rgba(22, 199, 132, 0.32);
             --amber-gold: #fbbf24;
             --cyan-accent: #38bdf8;
             --text-primary: #f8fafc;
             --text-secondary: #a1a1aa;
             --text-muted: #71717a;
-            --border-subtle: rgba(255, 255, 255, 0.08);
-            --border-rose: rgba(244, 63, 94, 0.35);
-            --success: #10b981;
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-rose: rgba(255, 46, 99, 0.35);
+            --success: #16c784;
             --danger: #ef4444;
         }
         * {
@@ -47,8 +47,8 @@
         body {
             background-color: var(--bg-void);
             background-image:
-                radial-gradient(circle at 50% 0%, rgba(190, 18, 60, 0.14) 0%, transparent 58%),
-                radial-gradient(circle at 85% 35%, rgba(16, 185, 129, 0.05) 0%, transparent 45%);
+                radial-gradient(circle at 50% 6%, rgba(159, 18, 57, 0.16) 0%, transparent 56%),
+                radial-gradient(circle at 80% 45%, rgba(225, 29, 72, 0.06) 0%, transparent 45%);
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
@@ -62,7 +62,7 @@
             from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .view { display: none; animation: fadeIn 0.2s ease-out; }
+        .view { display: none; animation: fadeIn 0.18s ease-out; }
         .view.active { display: block; }
         .setup-screen {
             position: fixed;
@@ -94,7 +94,7 @@
             letter-spacing: 1.4px;
             text-transform: uppercase;
             color: var(--rose-bright);
-            background: rgba(244, 63, 94, 0.12);
+            background: rgba(255, 46, 99, 0.12);
             border: 1px solid var(--border-rose);
             padding: 4px 10px;
             border-radius: 999px;
@@ -150,19 +150,19 @@
         }
         .input-field:focus {
             border-color: var(--rose-bright);
-            box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.14);
+            box-shadow: 0 0 0 3px rgba(255, 46, 99, 0.14);
         }
         .btn-rose {
             width: 100%;
-            padding: 13px 16px;
+            padding: 14px 16px;
             border-radius: 14px;
             border: none;
-            background: linear-gradient(180deg, #f43f5e 0%, #be123c 100%);
+            background: linear-gradient(180deg, #ff3366 0%, #c81444 100%);
             color: #ffffff;
             font-size: 14px;
             font-weight: 700;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.18s;
             box-shadow: 0 8px 24px var(--rose-glow);
             display: inline-flex;
             align-items: center;
@@ -213,10 +213,10 @@
             display: none;
             flex-direction: column;
             min-height: 100vh;
-            padding-bottom: 86px;
+            padding-bottom: 84px;
         }
         header {
-            background: rgba(7, 6, 9, 0.88);
+            background: rgba(9, 8, 12, 0.9);
             backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border-subtle);
             padding: 12px 16px;
@@ -229,9 +229,9 @@
         }
         .hdr-left { display: flex; align-items: center; gap: 10px; }
         .hdr-icon-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
@@ -242,48 +242,20 @@
             font-size: 13px;
             transition: 0.2s;
         }
-        .hdr-icon-btn:hover { color: var(--text-primary); border-color: rgba(255, 255, 255, 0.18); }
+        .hdr-icon-btn:hover { color: var(--text-primary); border-color: rgba(255, 255, 255, 0.16); }
         .hdr-title {
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 800;
             letter-spacing: -0.3px;
             color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .hdr-game-pill {
-            font-size: 10px;
-            font-weight: 700;
-            padding: 4px 9px;
-            border-radius: 999px;
-            background: var(--bg-elevated);
-            border: 1px solid var(--border-subtle);
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
+            margin-left: 2px;
         }
         .hdr-right { display: flex; align-items: center; gap: 8px; }
-        .hdr-cw-chip {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 10px;
-            padding: 6px 10px;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-primary);
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            cursor: pointer;
-        }
         .notification-bell-btn {
             position: relative;
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
+            width: 36px;
+            height: 36px;
+            border-radius: 11px;
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
             color: var(--text-secondary);
@@ -291,23 +263,24 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
         }
         .notification-badge {
             position: absolute;
-            top: -4px;
-            right: -4px;
+            top: -5px;
+            right: -5px;
             background: var(--rose-bright);
             color: #fff;
-            font-size: 9px;
+            font-size: 10px;
             font-weight: 800;
-            min-width: 16px;
-            height: 16px;
+            min-width: 17px;
+            height: 17px;
             padding: 0 4px;
             border-radius: 999px;
             display: flex;
             align-items: center;
             justify-content: center;
+            box-shadow: 0 0 10px var(--rose-glow);
         }
         main {
             flex: 1;
@@ -319,13 +292,13 @@
         .surface-card {
             background: var(--bg-surface);
             border: 1px solid var(--border-subtle);
-            border-radius: 18px;
+            border-radius: 20px;
             padding: 16px;
             margin-bottom: 14px;
         }
         .surface-card.rose-tint {
-            background: linear-gradient(180deg, rgba(136, 19, 55, 0.14) 0%, var(--bg-surface) 100%);
-            border-color: rgba(244, 63, 94, 0.18);
+            background: linear-gradient(180deg, rgba(136, 19, 55, 0.15) 0%, var(--bg-surface) 100%);
+            border-color: rgba(255, 46, 99, 0.16);
         }
         .player-hero-card {
             display: flex;
@@ -335,12 +308,12 @@
         }
         .player-hero-left { display: flex; align-items: center; gap: 14px; min-width: 0; }
         .emerald-avatar-frame {
-            width: 58px;
-            height: 58px;
-            border-radius: 14px;
-            background: #09120e;
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: #0a120f;
             border: 2px solid var(--emerald-neon);
-            box-shadow: 0 0 18px var(--emerald-glow), inset 0 0 12px rgba(16, 185, 129, 0.16);
+            box-shadow: 0 0 18px var(--emerald-glow), inset 0 0 12px rgba(22, 199, 132, 0.14);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -357,8 +330,8 @@
             position: absolute;
             bottom: -3px;
             right: -3px;
-            width: 8px;
-            height: 8px;
+            width: 9px;
+            height: 9px;
             border-radius: 50%;
             background: var(--emerald-neon);
             box-shadow: 0 0 8px var(--emerald-neon);
@@ -366,7 +339,7 @@
         .frame-cyan { border-color: #38bdf8 !important; box-shadow: 0 0 16px rgba(56, 189, 248, 0.35) !important; color: #38bdf8 !important; }
         .frame-gold { border-color: #fbbf24 !important; box-shadow: 0 0 16px rgba(251, 191, 36, 0.35) !important; color: #fbbf24 !important; }
         .frame-crimson { border-color: #f43f5e !important; box-shadow: 0 0 16px rgba(244, 63, 94, 0.35) !important; color: #f43f5e !important; }
-        .frame-emerald { border-color: #10b981 !important; box-shadow: 0 0 16px rgba(16, 185, 129, 0.35) !important; color: #10b981 !important; }
+        .frame-emerald { border-color: #16c784 !important; box-shadow: 0 0 16px rgba(22, 199, 132, 0.35) !important; color: #16c784 !important; }
         .hero-nick {
             font-size: 16px;
             font-weight: 800;
@@ -381,7 +354,7 @@
             font-size: 11px;
             color: var(--text-muted);
             font-family: 'JetBrains Mono', monospace;
-            margin-top: 3px;
+            margin-top: 4px;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -392,7 +365,7 @@
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 11px;
+            font-size: 12px;
             padding: 2px;
         }
         .copy-inline-btn:hover { color: var(--text-primary); }
@@ -403,15 +376,15 @@
             align-items: center;
         }
         .lvl-hex-badge {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-            background: rgba(16, 185, 129, 0.08);
-            border: 2px solid rgba(16, 185, 129, 0.55);
+            width: 52px;
+            height: 52px;
+            border-radius: 15px;
+            background: rgba(22, 199, 132, 0.08);
+            border: 2px solid rgba(22, 199, 132, 0.55);
             color: var(--emerald-neon);
             font-family: 'Orbitron', sans-serif;
             font-weight: 800;
-            font-size: 17px;
+            font-size: 18px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -422,13 +395,15 @@
             justify-content: space-between;
             gap: 8px;
             margin-bottom: 8px;
+            flex-wrap: wrap;
         }
         .elo-score-group { display: flex; align-items: center; gap: 8px; }
         .elo-big-num {
             font-family: 'Orbitron', sans-serif;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 900;
             color: var(--text-primary);
+            line-height: 1;
         }
         .elo-pill {
             font-size: 10px;
@@ -436,9 +411,9 @@
             text-transform: uppercase;
             letter-spacing: 0.6px;
             color: #fda4af;
-            background: rgba(225, 29, 72, 0.22);
+            background: rgba(225, 29, 72, 0.24);
             border: 1px solid rgba(244, 63, 94, 0.35);
-            padding: 2px 7px;
+            padding: 3px 7px;
             border-radius: 6px;
         }
         .elo-mini-stats {
@@ -453,7 +428,7 @@
         .elo-track {
             width: 100%;
             height: 6px;
-            background: rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 999px;
             overflow: hidden;
             margin-bottom: 6px;
@@ -461,7 +436,7 @@
         .elo-fill {
             height: 100%;
             width: 0%;
-            background: linear-gradient(90deg, #10b981 0%, #f43f5e 100%);
+            background: linear-gradient(90deg, #16c784 0%, #ff2e63 100%);
             border-radius: 999px;
             transition: width 0.45s ease;
         }
@@ -472,7 +447,7 @@
             font-family: 'JetBrains Mono', monospace;
             color: var(--text-muted);
         }
-        .elo-sub-row .next-hint { color: #fb7185; font-weight: 600; }
+        .elo-sub-row .next-hint { color: #ff4d79; font-weight: 600; }
         .section-eyebrow {
             font-size: 11px;
             font-weight: 700;
@@ -521,9 +496,9 @@
             margin-bottom: 14px;
         }
         .league-title-main {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 0.4px;
+            font-size: 19px;
+            font-weight: 900;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
         }
         .league-desc-sub {
@@ -536,9 +511,9 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.7px;
-            color: #fb7185;
-            background: rgba(225, 29, 72, 0.16);
-            border: 1px solid rgba(244, 63, 94, 0.3);
+            color: #ff4d79;
+            background: rgba(255, 46, 99, 0.15);
+            border: 1px solid rgba(255, 46, 99, 0.32);
             padding: 4px 10px;
             border-radius: 999px;
         }
@@ -549,10 +524,10 @@
             margin-bottom: 12px;
         }
         .telemetry-box {
-            background: var(--bg-void);
+            background: rgba(8, 7, 10, 0.85);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
-            padding: 11px 10px;
+            border-radius: 14px;
+            padding: 12px 11px;
         }
         .telemetry-lbl {
             font-size: 10px;
@@ -563,11 +538,11 @@
             display: flex;
             align-items: center;
             gap: 5px;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
         }
         .telemetry-val {
             font-family: 'Orbitron', sans-serif;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 800;
             color: var(--text-primary);
         }
@@ -575,13 +550,13 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 12px;
+            padding: 12px 14px;
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid var(--border-subtle);
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 12px;
             color: var(--text-secondary);
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
         .party-selector {
             display: grid;
@@ -602,7 +577,7 @@
         }
         .party-btn.active {
             border-color: var(--border-rose);
-            background: rgba(225, 29, 72, 0.14);
+            background: rgba(255, 46, 99, 0.14);
             color: var(--text-primary);
         }
         .party-slots {
@@ -658,7 +633,7 @@
             text-transform: uppercase;
         }
         .list-action-row {
-            background: var(--bg-surface);
+            background: rgba(14, 12, 17, 0.9);
             border: 1px solid var(--border-subtle);
             border-radius: 16px;
             padding: 14px;
@@ -666,7 +641,7 @@
             align-items: center;
             justify-content: space-between;
             gap: 12px;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -684,25 +659,6 @@
             font-size: 15px;
             flex-shrink: 0;
         }
-        .ach-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-        .ach-card {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-subtle);
-            border-radius: 16px;
-            padding: 16px 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            opacity: 0.55;
-        }
-        .ach-card.unlocked { opacity: 1; border-color: rgba(16, 185, 129, 0.35); }
         .kd-hero-box {
             display: flex;
             align-items: center;
@@ -796,7 +752,7 @@
             padding: 10px 6px;
             border-bottom: 1px solid var(--border-subtle);
         }
-        .row-me { background: rgba(225, 29, 72, 0.12); }
+        .row-me { background: rgba(255, 46, 99, 0.12); }
         .veto-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
@@ -830,7 +786,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(11, 9, 13, 0.95);
+            background: rgba(11, 10, 14, 0.96);
             backdrop-filter: blur(16px);
             border-top: 1px solid var(--border-subtle);
             display: flex;
@@ -948,14 +904,6 @@
                 <div class="hdr-title" id="hdr-page-title">Играть</div>
             </div>
             <div class="hdr-right">
-                <button type="button" class="hdr-game-pill" onclick="toggleGameDiscipline()" title="Сменить дисциплину">
-                    <span id="hdr-game-name">Standrise</span>
-                    <i class="fa-solid fa-repeat"></i>
-                </button>
-                <button type="button" class="hdr-cw-chip" onclick="switchView('clans')" title="Кланы и CW">
-                    <i class="fa-solid fa-shield" style="color: var(--text-secondary);"></i>
-                    <span id="hdr-clan-elo">0</span>
-                </button>
                 <div class="notification-bell-btn" onclick="switchView('notifications')" title="Уведомления">
                     <i class="fa-regular fa-bell"></i>
                     <div id="notif-badge" class="notification-badge" style="display: none;">0</div>
@@ -982,9 +930,6 @@
                             </div>
                         </div>
                     </div>
-                    <button type="button" class="btn-ghost" style="width: auto; padding: 7px 11px; font-size: 11px;" onclick="switchView('profile')">
-                        Профиль
-                    </button>
                 </div>
                 <div class="surface-card rose-tint elo-panel">
                     <div class="lvl-hex-badge" id="play-lvl-badge">1</div>
@@ -1029,7 +974,7 @@
                     </div>
                     <div class="telemetry-grid">
                         <div class="telemetry-box">
-                            <div class="telemetry-lbl"><i class="fa-solid fa-user-group"></i> ОНЛАЙН</div>
+                            <div class="telemetry-lbl"><i class="fa-solid fa-user-group"></i> В ИГРЕ</div>
                             <div class="telemetry-val" id="online-count">0</div>
                         </div>
                         <div class="telemetry-box">
@@ -1045,24 +990,28 @@
                         <span><i class="fa-solid fa-chart-line" style="color: var(--rose-bright); margin-right: 6px;"></i> Матчей в сезоне:</span>
                         <strong style="font-family: 'JetBrains Mono', monospace; color: var(--text-primary);" id="season-matches-count">0</strong>
                     </div>
-                    <div class="list-action-row" style="margin-bottom: 12px;" onclick="switchView('ladder')">
+                    <div class="list-action-row" onclick="switchView('ladder')">
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <i class="fa-solid fa-trophy" style="color: var(--amber-gold);"></i>
                             <span style="font-size: 13px; font-weight: 600;">Рейтинг сезона • <strong id="season-rank-inline">—</strong></span>
                         </div>
                         <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
                     </div>
-                    <div class="party-selector">
+                    <div class="party-selector" style="display: none;">
                         <button type="button" class="party-btn active" id="pbtn-1" onclick="selectPartyLimit(1)">Solo (1)</button>
                         <button type="button" class="party-btn" id="pbtn-2" onclick="selectPartyLimit(2)">Duo (2)</button>
                         <button type="button" class="party-btn" id="pbtn-3" onclick="selectPartyLimit(3)">Trio (3)</button>
                     </div>
-                    <div class="party-slots" id="party-slots-box"></div>
+                    <div class="party-slots" id="party-slots-box" style="display: none;"></div>
                     <button type="button" class="btn-rose" onclick="startQueue()">
                         <i class="fa-solid fa-magnifying-glass"></i> Найти матч
                     </button>
-                    <div style="text-align: center; margin-top: 12px; font-size: 11px; color: var(--text-muted);">
-                        <i class="fa-solid fa-gamepad" style="margin-right: 4px;"></i> Дисциплина: <strong style="color: var(--text-secondary);" id="play-discipline-footer">Standrise</strong> • Online Sync
+                    <div style="text-align: center; margin-top: 14px; font-size: 12px; color: var(--text-muted);">
+                        <button type="button" onclick="toggleGameDiscipline()" style="background:none; border:none; color:var(--text-muted); font-size:12px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                            <i class="fa-solid fa-gamepad"></i>
+                            <span>Дисциплина: <strong style="color: var(--text-secondary);" id="play-discipline-footer">Standrise</strong></span>
+                            <i class="fa-solid fa-chevron-right" style="font-size: 10px;"></i>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -1118,7 +1067,7 @@
                     </div>
                 </div>
             </section>
-            <!-- ВКЛАДКА: ДРУЗЬЯ / ПАТИ (ТОЛЬКО РЕАЛЬНЫЕ ИГРОКИ ИЗ FIRESTORE) -->
+            <!-- ВКЛАДКА: ДРУЗЬЯ / ПАТИ -->
             <section id="view-friends" class="view">
                 <div class="surface-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -1145,7 +1094,7 @@
                     </div>
                 </div>
             </section>
-            <!-- ВКЛАДКА: ЛАДДЕР (ТОЛЬКО РЕАЛЬНЫЕ ПОЛЬЗОВАТЕЛИ ИЗ FIRESTORE) -->
+            <!-- ВКЛАДКА: ЛАДДЕР -->
             <section id="view-ladder" class="view">
                 <div class="surface-card">
                     <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
@@ -1235,7 +1184,7 @@
                     </div>
                 </div>
             </section>
-            <!-- ВКЛАДКА: МАГАЗИН / КЛАНЫ (ТОЛЬКО РЕАЛЬНЫЕ КЛАНЫ В FIRESTORE) -->
+            <!-- ВКЛАДКА: МАГАЗИН / КЛАНЫ -->
             <section id="view-clans" class="view">
                 <div class="surface-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -1305,7 +1254,7 @@
                     </div>
                 </div>
             </section>
-            <!-- ВКЛАДКА: ПРОФИЛЬ -->
+            <!-- ВКЛАДКА: ПРОФИЛЬ (БЕЗ ДОСТИЖЕНИЙ) -->
             <section id="view-profile" class="view">
                 <div class="surface-card player-hero-card">
                     <div class="player-hero-left">
@@ -1330,7 +1279,7 @@
                 </div>
                 <div class="list-action-row" onclick="switchView('clans')">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div class="row-icon-box" style="background: rgba(225, 29, 72, 0.14); border-color: rgba(244, 63, 94, 0.28); color: var(--rose-bright);">
+                        <div class="row-icon-box" style="background: rgba(255, 46, 99, 0.14); border-color: rgba(255, 46, 99, 0.28); color: var(--rose-bright);">
                             <i class="fa-solid fa-user-group"></i>
                         </div>
                         <div>
@@ -1349,15 +1298,6 @@
                         </div>
                     </div>
                     <i class="fa-solid fa-chevron-right" style="color: var(--text-muted); font-size: 12px;"></i>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                    <span class="section-eyebrow" style="margin: 0;">ДОСТИЖЕНИЯ</span>
-                    <span class="font-mono" style="font-size: 11px; color: var(--text-muted);" id="ach-counter">0/3</span>
-                </div>
-                <div class="ach-grid">
-                    <div class="ach-card" id="ach-1"><i class="fa-solid fa-skull" style="font-size: 20px; color: var(--text-muted);"></i><span style="font-size: 10px; color: var(--text-muted);">Первый матч</span></div>
-                    <div class="ach-card" id="ach-2"><i class="fa-solid fa-mountain" style="font-size: 20px; color: var(--text-muted);"></i><span style="font-size: 10px; color: var(--text-muted);">5 побед</span></div>
-                    <div class="ach-card" id="ach-3"><i class="fa-solid fa-users" style="font-size: 20px; color: var(--text-muted);"></i><span style="font-size: 10px; color: var(--text-muted);">В клане</span></div>
                 </div>
                 <div class="surface-card rose-tint elo-panel">
                     <div class="lvl-hex-badge" id="prof-lvl-badge">1</div>
@@ -1428,7 +1368,7 @@
                     </div>
                 </div>
                 <!-- ПАНЕЛЬ РАЗРАБОТЧИКА -->
-                <div id="dev-admin-dashboard" class="surface-card" style="display: none; border-color: var(--border-rose); background: rgba(225, 29, 72, 0.06);">
+                <div id="dev-admin-dashboard" class="surface-card" style="display: none; border-color: var(--border-rose); background: rgba(255, 46, 99, 0.06);">
                     <div style="font-size: 13px; font-weight: 800; color: var(--rose-bright); margin-bottom: 6px; text-transform: uppercase;">
                         <i class="fa-solid fa-shield-halved"></i> Комната Разработчика (<span id="dev-room-label">DEV</span>)
                     </div>
@@ -1462,7 +1402,7 @@
             </button>
             <button type="button" class="nav-btn" data-tab="clans" onclick="switchView('clans')">
                 <i class="fa-solid fa-bag-shopping"></i>
-                <span>Кланы</span>
+                <span>Магазин</span>
             </button>
             <button type="button" class="nav-btn" data-tab="profile" onclick="switchView('profile')">
                 <i class="fa-regular fa-user"></i>
@@ -1561,6 +1501,7 @@
             messagingSenderId: "69449415263",
             appId: "1:69449415263:web:dfa34c454e5ca7e350b9ea"
         };
+        const SESSION_STORAGE_KEY = 'sr_rising_saved_session_v1';
         let db = null;
         try {
             if (typeof firebase !== 'undefined') {
@@ -1612,9 +1553,36 @@
         let queueInterval = null, readyInterval = null, queueUnsubscribe = null, usersSyncUnsub = null, queueGlobalUnsub = null, notifUnsub = null, clanQueueUnsub = null, devSyncUnsub = null, devHeartbeatTimer = null, heartbeatInterval = null;
         let queueRef = null, clanQueueRef = null, saveTimer = null;
         function getClientUuid() {
-            return 'sess_' + Math.random().toString(36).slice(2) + '_' + Date.now();
+            try {
+                let id = localStorage.getItem('sr_rising_client_uuid');
+                if (!id) {
+                    id = 'sess_' + Math.random().toString(36).slice(2) + '_' + Date.now();
+                    localStorage.setItem('sr_rising_client_uuid', id);
+                }
+                return id;
+            } catch (e) {
+                return 'sess_' + Math.random().toString(36).slice(2) + '_' + Date.now();
+            }
         }
         const SESSION_UUID = getClientUuid();
+        function saveSessionLocally() {
+            try {
+                if (!account.platformCode) return;
+                localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
+                    platformCode: account.platformCode,
+                    password: account.password,
+                    devRoomKey: account.devRoomKey || null,
+                    game: account.game || 'Standrise',
+                    activeLeague: account.activeLeague || 'default',
+                    profiles: account.profiles
+                }));
+            } catch (e) {}
+        }
+        function clearSessionLocally() {
+            try {
+                localStorage.removeItem(SESSION_STORAGE_KEY);
+            } catch (e) {}
+        }
         function getRequiredPlayersCount() {
             return account.game === 'Brawlstars' ? 6 : 10;
         }
@@ -1644,6 +1612,7 @@
             notify(`ID ${account.platformCode} скопирован`);
         }
         function syncUserToFirestore() {
+            saveSessionLocally();
             if (!db || !account.platformCode) return;
             const prof = getActiveProfile();
             try {
@@ -1830,14 +1799,65 @@
             }
         }
         function finishAuthProcess() {
+            saveSessionLocally();
             document.getElementById('screen-auth').style.display = 'none';
             initAppShell();
         }
+        async function tryRestoreSavedSession() {
+            try {
+                const raw = localStorage.getItem(SESSION_STORAGE_KEY);
+                if (!raw) {
+                    document.getElementById('input-auth-id').value = 'SR-' + Math.floor(100000 + Math.random() * 899999);
+                    return;
+                }
+                const saved = JSON.parse(raw);
+                if (!saved || !saved.platformCode) {
+                    document.getElementById('input-auth-id').value = 'SR-' + Math.floor(100000 + Math.random() * 899999);
+                    return;
+                }
+                account.platformCode = saved.platformCode;
+                account.password = saved.password || null;
+                account.devRoomKey = saved.devRoomKey || null;
+                account.game = saved.game || 'Standrise';
+                account.activeLeague = saved.activeLeague || 'default';
+                if (saved.profiles) {
+                    account.profiles = Object.assign({}, account.profiles, saved.profiles);
+                }
+                if (db) {
+                    try {
+                        const snap = await db.collection('users').doc(`${account.platformCode}_${account.game}`).get();
+                        if (snap.exists) {
+                            const remoteUser = snap.data();
+                            const localProf = getActiveProfile();
+                            account.profiles[account.game] = {
+                                nick: remoteUser.nick || localProf.nick || 'Player',
+                                uidtag: remoteUser.uidtag || localProf.uidtag || account.platformCode,
+                                elo: typeof remoteUser.elo === 'number' ? remoteUser.elo : (localProf.elo || 0),
+                                matches: typeof remoteUser.matches === 'number' ? remoteUser.matches : (localProf.matches || 0),
+                                wins: typeof remoteUser.wins === 'number' ? remoteUser.wins : (localProf.wins || 0),
+                                losses: typeof remoteUser.losses === 'number' ? remoteUser.losses : (localProf.losses || 0),
+                                clan: remoteUser.clan !== undefined ? remoteUser.clan : (localProf.clan || null),
+                                clanElo: typeof remoteUser.clanElo === 'number' ? remoteUser.clanElo : (localProf.clanElo || 0),
+                                clanMembers: remoteUser.clanMembers || localProf.clanMembers || [],
+                                friends: remoteUser.friends || localProf.friends || [],
+                                customAvatar: remoteUser.customAvatar || localProf.customAvatar || '',
+                                frame: remoteUser.frame || localProf.frame || '',
+                                mapStats: localProf.mapStats || {},
+                                history: localProf.history || []
+                            };
+                        }
+                    } catch (err) {}
+                }
+                finishAuthProcess();
+            } catch (e) {
+                document.getElementById('input-auth-id').value = 'SR-' + Math.floor(100000 + Math.random() * 899999);
+            }
+        }
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('input-auth-id').value = 'SR-' + Math.floor(100000 + Math.random() * 899999);
+            tryRestoreSavedSession();
         });
         window.addEventListener('beforeunload', () => {
-            releaseDevSessionIfNeeded();
+            saveSessionLocally();
             if (db && account.platformCode) {
                 db.collection('queue').doc(`${account.platformCode}_${account.game}`).delete().catch(() => {});
                 const prof = getActiveProfile();
@@ -1858,12 +1878,14 @@
         }
         function logoutAccount() {
             releaseDevSessionIfNeeded();
+            clearSessionLocally();
             if (heartbeatInterval) clearInterval(heartbeatInterval);
             location.reload();
         }
         async function deleteAccountData() {
             if (!confirm("Удалить аккаунт из сети навсегда?")) return;
             releaseDevSessionIfNeeded();
+            clearSessionLocally();
             if (db && account.platformCode) {
                 try {
                     await db.collection('users').doc(`${account.platformCode}_Standrise`).delete().catch(() => {});
@@ -1878,6 +1900,7 @@
         function toggleGameDiscipline() {
             account.game = account.game === 'Standrise' ? 'Brawlstars' : 'Standrise';
             partyTeammates = [null, null];
+            saveSessionLocally();
             applyDisciplineUI();
             renderPartySlots();
             renderFriendsPartySlots();
@@ -1898,6 +1921,7 @@
                 return;
             }
             account.activeLeague = league;
+            saveSessionLocally();
             document.querySelectorAll('.league-tab-item').forEach(el => el.classList.remove('active'));
             document.getElementById(`league-tab-${league}`).classList.add('active');
             const titles = { default: 'DEFAULT', qual: 'QUAL', pro: 'PRO' };
@@ -1913,8 +1937,6 @@
         }
         function applyDisciplineUI() {
             const prof = getActiveProfile();
-            document.getElementById('hdr-game-name').textContent = account.game;
-            document.getElementById('hdr-clan-elo').textContent = prof.clanElo || 0;
             document.getElementById('play-discipline-footer').textContent = account.game;
             document.getElementById('ladder-game-label').textContent = account.game;
             document.getElementById('clan-game-title').textContent = account.game;
@@ -1978,6 +2000,7 @@
             const prof = getActiveProfile();
             prof.nick = document.getElementById('prof-edit-nick').value.trim();
             prof.uidtag = document.getElementById('prof-edit-uid').value.trim();
+            saveSessionLocally();
             updateUI();
             renderPartySlots();
             renderFriendsPartySlots();
@@ -2147,14 +2170,6 @@
             document.getElementById('prof-kd-val').textContent = kd;
             document.getElementById('prof-wr-val').textContent = `${wr}%`;
             document.getElementById('prof-wins-val').textContent = wins;
-            let achCount = 0;
-            const a1 = document.getElementById('ach-1');
-            const a2 = document.getElementById('ach-2');
-            const a3 = document.getElementById('ach-3');
-            if (matches >= 1) { a1.classList.add('unlocked'); achCount++; } else a1.classList.remove('unlocked');
-            if (wins >= 5) { a2.classList.add('unlocked'); achCount++; } else a2.classList.remove('unlocked');
-            if (prof.clan) { a3.classList.add('unlocked'); achCount++; } else a3.classList.remove('unlocked');
-            document.getElementById('ach-counter').textContent = `${achCount}/3`;
             const stageMin = (lvl - 1) * 900;
             const stageMax = lvl * 900 - 1;
             document.getElementById('ladder-stage-lvl').textContent = lvl;
@@ -2224,7 +2239,7 @@
                 play: 'Играть',
                 ladder: 'Ладдер',
                 friends: 'Друзья',
-                clans: 'Кланы',
+                clans: 'Магазин',
                 profile: 'Профиль',
                 notifications: 'Уведомления',
                 match: 'Матч'
