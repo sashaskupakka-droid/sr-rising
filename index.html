@@ -1,0 +1,2993 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SR FACEIT — Competitive Esports Platform</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&family=Orbitron:wght@700;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Firebase Compat SDK v10.8.0 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        :root {
+            --bg-obsidian: #07090e;
+            --bg-surface: #0d111a;
+            --bg-card: #121724;
+            --bg-elevated: #182032;
+            --bg-hover: #1f2940;
+
+            --accent-crimson: #ff4655;
+            --accent-faceit: #ff5500;
+            --accent-glow: rgba(255, 70, 85, 0.38);
+
+            --gold: #ffb800;
+            --cyan: #00e5ff;
+            --emerald: #00e676;
+            --danger: #ff2e4c;
+
+            --text-primary: #f4f7fb;
+            --text-secondary: #8899b5;
+            --text-muted: #586882;
+
+            --border-subtle: #1e283c;
+            --border-strong: #2e3d5c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            background-color: var(--bg-obsidian);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 50% 0%, rgba(255, 46, 110, 0.14), transparent 46%),
+                radial-gradient(circle at 15% 18%, rgba(255, 70, 85, 0.08), transparent 40%),
+                linear-gradient(to bottom, rgba(16, 12, 20, 0.72), rgba(7, 9, 14, 0.99));
+        }
+
+        .font-cyber { font-family: 'Orbitron', sans-serif; }
+        .font-display { font-family: 'Rajdhani', sans-serif; }
+        .font-mono-code { font-family: 'JetBrains Mono', monospace; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--bg-obsidian); }
+        ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-crimson); }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(10px) scale(0.99); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(255, 70, 85, 0.45); }
+            50% { box-shadow: 0 0 22px 4px rgba(255, 70, 85, 0.25); }
+        }
+
+        .anim-enter {
+            animation: fadeSlideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* FACEIT Skill Level Badges (1 - 10) */
+        .lvl-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border-radius: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 11px;
+            border: 2px solid;
+            flex-shrink: 0;
+        }
+        .lvl-1 { border-color: #9ca3af; color: #e5e7eb; background: rgba(156, 163, 175, 0.14); }
+        .lvl-2, .lvl-3 { border-color: #10b981; color: #34d399; background: rgba(16, 185, 129, 0.14); }
+        .lvl-4, .lvl-5, .lvl-6, .lvl-7 { border-color: #ff9900; color: #ffb833; background: rgba(255, 153, 0, 0.16); }
+        .lvl-8, .lvl-9 { border-color: #ff4655; color: #ff6b77; background: rgba(255, 70, 85, 0.18); }
+        .lvl-10 {
+            border-color: #ff5500;
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(255, 70, 85, 0.45), rgba(255, 153, 0, 0.45));
+            box-shadow: 0 0 14px rgba(255, 85, 0, 0.55);
+        }
+
+        .faceit-card {
+            background: linear-gradient(180deg, rgba(22, 20, 31, 0.92) 0%, rgba(12, 14, 22, 0.97) 100%);
+            border: 1px solid var(--border-subtle);
+            border-radius: 18px;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.48);
+        }
+
+        .faceit-card-accent {
+            position: relative;
+            overflow: hidden;
+        }
+        .faceit-card-accent::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent-crimson), var(--accent-faceit), var(--gold));
+        }
+
+        .btn-faceit-primary {
+            background: linear-gradient(135deg, #ff1e56, #ff4655);
+            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            border-radius: 14px;
+            box-shadow: 0 8px 28px rgba(255, 30, 86, 0.38);
+            transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.2s ease;
+        }
+        .btn-faceit-primary:hover {
+            filter: brightness(1.08);
+            transform: translateY(-1px);
+            box-shadow: 0 10px 32px rgba(255, 30, 86, 0.5);
+        }
+        .btn-faceit-primary:active {
+            transform: translateY(0) scale(0.99);
+        }
+
+        .btn-faceit-secondary {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border: 1px solid var(--border-strong);
+            border-radius: 12px;
+            transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+        }
+        .btn-faceit-secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-faceit);
+        }
+
+        .input-faceit {
+            width: 100%;
+            background: var(--bg-obsidian);
+            border: 1px solid var(--border-subtle);
+            border-radius: 11px;
+            padding: 10px 13px;
+            color: var(--text-primary);
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .input-faceit:focus {
+            border-color: var(--accent-crimson);
+            box-shadow: 0 0 0 3px rgba(255, 70, 85, 0.18);
+        }
+        .input-faceit.input-error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(255, 46, 76, 0.22);
+        }
+
+        .select-tile {
+            background: var(--bg-obsidian);
+            border: 2px solid var(--border-subtle);
+            border-radius: 14px;
+            padding: 18px 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.16s ease;
+        }
+        .select-tile:hover {
+            border-color: var(--border-strong);
+            background: var(--bg-elevated);
+        }
+        .select-tile.active {
+            border-color: var(--accent-crimson);
+            background: rgba(255, 70, 85, 0.12);
+            box-shadow: 0 0 22px var(--accent-glow);
+        }
+
+        .party-mode-btn {
+            background: var(--bg-obsidian);
+            border: 1.5px solid var(--border-subtle);
+            color: var(--text-secondary);
+            border-radius: 11px;
+            padding: 9px 8px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .party-mode-btn.active {
+            border-color: var(--accent-crimson);
+            color: #ffffff;
+            background: rgba(255, 70, 85, 0.15);
+            box-shadow: 0 0 16px rgba(255, 70, 85, 0.25);
+        }
+
+        .league-tab-btn {
+            padding: 7px 14px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            background: transparent;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .league-tab-btn.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.07);
+            border-color: rgba(255, 255, 255, 0.16);
+        }
+
+        .podium-card {
+            background: linear-gradient(180deg, rgba(24, 24, 36, 0.95) 0%, rgba(12, 13, 21, 0.98) 100%);
+            border: 1.5px solid #24293d;
+            border-radius: 18px;
+            padding: 14px 10px 18px;
+            text-align: center;
+            position: relative;
+        }
+        .podium-card.first {
+            border-color: #e5b84b;
+            background: linear-gradient(180deg, rgba(44, 35, 16, 0.65) 0%, rgba(16, 15, 24, 0.98) 100%);
+            box-shadow: 0 12px 32px rgba(229, 184, 75, 0.16);
+        }
+
+        .podium-rank-pill {
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 22px;
+            height: 22px;
+            border-radius: 999px;
+            background: #1a2033;
+            border: 1.5px solid #364163;
+            color: #e2e8f0;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .podium-card.first .podium-rank-pill {
+            background: #2b2310;
+            border-color: #e5b84b;
+            color: #ffd56b;
+        }
+
+        .ladder-row-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: rgba(16, 19, 30, 0.92);
+            border: 1px solid #1e2538;
+            transition: border-color 0.15s ease, transform 0.12s ease;
+        }
+        .ladder-row-card:hover {
+            border-color: #323e5e;
+        }
+        .ladder-row-card.self-row {
+            border-color: rgba(255, 70, 85, 0.65);
+            background: linear-gradient(90deg, rgba(255, 70, 85, 0.14), rgba(16, 19, 30, 0.95));
+        }
+
+        .map-veto-card {
+            background: var(--bg-obsidian);
+            border: 1.5px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .map-veto-card:hover:not(.banned) {
+            border-color: var(--cyan);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 229, 255, 0.16);
+        }
+        .map-veto-card.banned {
+            opacity: 0.28;
+            border-color: var(--danger);
+            text-decoration: line-through;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        .nav-item-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            padding: 6px 14px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            font-weight: 700;
+            transition: color 0.15s ease, background-color 0.15s ease;
+        }
+        .nav-item-btn.active {
+            color: #ff3b6b;
+            background: rgba(255, 59, 107, 0.12);
+        }
+
+        .toast-banner {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-strong);
+            border-left: 4px solid var(--accent-crimson);
+            color: var(--text-primary);
+            padding: 11px 15px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.65);
+            animation: fadeSlideUp 0.22s ease forwards;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-rose-500/30 selection:text-white">
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-[300] flex flex-col gap-2 max-w-[320px] pointer-events-none"></div>
+
+    <!-- ONBOARDING STEP 1: LANGUAGE -->
+    <div id="onboarding-lang" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-[#07090e]/95 backdrop-blur-md">
+        <div class="faceit-card faceit-card-accent anim-enter w-full max-w-md p-6 sm:p-8">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold tracking-wider uppercase mb-3">
+                    <i class="fa-solid fa-bolt"></i> Competitive Hub
+                </div>
+                <h1 class="font-cyber text-3xl font-black tracking-wide">
+                    SR <span class="text-[#ff4655]">FACEIT</span>
+                </h1>
+                <p id="onboard-lang-sub" class="text-xs sm:text-sm text-[#8899b5] mt-2">
+                    Выберите язык веб-сайта / Select website language
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div id="lang-opt-ru" class="select-tile active" onclick="chooseOnboardingLang('ru')">
+                    <i class="fa-solid fa-earth-europe text-2xl text-[#ff4655] mb-2"></i>
+                    <div class="font-cyber text-sm font-extrabold">Русский</div>
+                    <div class="text-[11px] text-[#8899b5] mt-0.5">RU • Основной</div>
+                </div>
+                <div id="lang-opt-en" class="select-tile" onclick="chooseOnboardingLang('en')">
+                    <i class="fa-solid fa-earth-americas text-2xl text-[#00e5ff] mb-2"></i>
+                    <div class="font-cyber text-sm font-extrabold">English</div>
+                    <div class="text-[11px] text-[#8899b5] mt-0.5">EN • Global</div>
+                </div>
+            </div>
+
+            <button id="btn-next-game" onclick="advanceToGameStep()" class="btn-faceit-primary w-full py-3.5 text-base cursor-pointer">
+                Продолжить
+            </button>
+        </div>
+    </div>
+
+    <!-- ONBOARDING STEP 2: DISCIPLINE -->
+    <div id="onboarding-game" class="fixed inset-0 z-[200] hidden items-center justify-center p-4 bg-[#07090e]/95 backdrop-blur-md">
+        <div class="faceit-card faceit-card-accent anim-enter w-full max-w-md p-6 sm:p-8">
+            <div class="text-center mb-6">
+                <h1 class="font-cyber text-3xl font-black tracking-wide">
+                    SR <span class="text-[#ff5500]">FACEIT</span>
+                </h1>
+                <p id="onboard-game-sub" class="text-xs sm:text-sm text-[#8899b5] mt-2">
+                    Выберите дисциплину веб-платформы SR FACEIT
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div id="game-opt-Standrise" class="select-tile active" onclick="chooseOnboardingGame('Standrise')">
+                    <i class="fa-solid fa-crosshairs text-2xl text-[#ff4655] mb-2"></i>
+                    <div class="font-cyber text-sm font-extrabold">Standrise</div>
+                    <div class="text-[11px] text-[#8899b5] mt-0.5">5v5 Tactical</div>
+                </div>
+                <div id="game-opt-Brawlstars" class="select-tile" onclick="chooseOnboardingGame('Brawlstars')">
+                    <i class="fa-solid fa-trophy text-2xl text-[#ffb800] mb-2"></i>
+                    <div class="font-cyber text-sm font-extrabold">Brawlstars</div>
+                    <div class="text-[11px] text-[#8899b5] mt-0.5">3v3 Arena</div>
+                </div>
+            </div>
+
+            <div class="flex gap-2.5">
+                <button id="btn-back-lang" onclick="backToLangStep()" class="btn-faceit-secondary px-4 py-3.5 text-sm font-bold cursor-pointer">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <button id="btn-enter-hub" onclick="completeOnboarding()" class="btn-faceit-primary flex-1 py-3.5 text-base cursor-pointer">
+                    Открыть SR FACEIT
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SHELL -->
+    <div id="app-shell" class="hidden min-h-screen flex-col pb-24">
+        <!-- Sticky Top Header -->
+        <header class="sticky top-0 z-40 bg-[#0a0c14]/90 backdrop-blur-md border-b border-[#1c2235]">
+            <div class="max-w-xl mx-auto px-3.5 h-14 flex items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <button onclick="openOnboardingReset()" class="w-8 h-8 rounded-full bg-[#151929] border border-[#242b42] flex items-center justify-center text-[#b7c4dc] hover:text-white cursor-pointer" title="Settings">
+                        <i class="fa-solid fa-gear text-xs"></i>
+                    </button>
+                    <a href="https://t.me/sr_rising_support_bot" target="_blank" rel="noopener noreferrer"
+                       class="w-8 h-8 rounded-full bg-[#151929] border border-[#242b42] flex items-center justify-center text-[#b7c4dc] hover:text-[#ff4655] transition"
+                       title="Связаться с нами">
+                        <i class="fa-solid fa-headset text-xs"></i>
+                    </a>
+                    <span id="hdr-screen-title" class="text-base font-extrabold tracking-tight text-white ml-1">Играть</span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="quickToggleGame()" class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-[#151929] border border-[#262f4a] text-[#ffb800] hover:border-[#ff4655] transition cursor-pointer">
+                        <span id="hdr-game-pill">Standrise • 5v5</span>
+                        <i class="fa-solid fa-repeat text-[9px]"></i>
+                    </button>
+
+                    <button id="hdr-match-return-btn" onclick="switchView('match')" class="hidden items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-400/50 text-emerald-300 text-[11px] font-bold cursor-pointer">
+                        <i class="fa-solid fa-gamepad"></i>
+                        <span>Match</span>
+                    </button>
+
+                    <button onclick="switchView('profile')" class="w-8 h-8 rounded-full bg-[#151929] border border-[#242b42] flex items-center justify-center text-[#b7c4dc] hover:text-white cursor-pointer" title="Profile">
+                        <i class="fa-regular fa-bell text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Container -->
+        <main class="flex-1 w-full max-w-xl mx-auto px-3.5 pt-3.5 space-y-3.5">
+
+            <!-- VIEW 1: PLAY -->
+            <section id="view-play" class="app-view anim-enter space-y-3.5">
+                <!-- Discipline & Player Card with SR Rising ID -->
+                <div class="faceit-card p-3.5">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-12 h-12 rounded-2xl bg-[#111927] border border-[#19c37d]/45 flex items-center justify-center text-[#19c37d] shadow-[0_0_16px_rgba(25,195,125,0.2)] shrink-0">
+                                <i id="play-disc-icon" class="fa-solid fa-crosshairs text-lg"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <div id="play-card-title" class="text-sm font-extrabold text-white truncate">Standrise Ranking</div>
+                                <div class="font-mono-code text-[11px] text-[#7c8aa6] truncate">
+                                    <span id="play-card-nick">Player</span> • Game ID <span id="play-card-id">000000</span>
+                                </div>
+                            </div>
+                        </div>
+                        <span id="play-disc-badge" class="px-2 py-0.5 rounded-md bg-[#171e30] border border-[#27324d] text-[10px] font-bold text-[#ffb800] shrink-0">5v5</span>
+                    </div>
+
+                    <!-- SR Rising ID Strip -->
+                    <div class="mt-3 pt-2.5 border-t border-[#1c2336] flex items-center justify-between gap-2 bg-[#0b0e17] border border-[#1d253b] rounded-xl px-3 py-2">
+                        <div class="flex items-center gap-2 min-w-0">
+                            <span class="px-1.5 py-0.5 rounded bg-cyan-500/15 border border-cyan-500/35 text-[9px] font-extrabold text-[#00e5ff] uppercase tracking-wider shrink-0">
+                                SR RISING ID
+                            </span>
+                            <span id="play-sr-rising-id" class="font-mono-code text-xs sm:text-sm font-bold text-white tracking-wider truncate">
+                                000000
+                            </span>
+                        </div>
+                        <button type="button" onclick="copySrRisingId(this)" class="px-2.5 py-1 rounded-lg bg-[#182032] hover:bg-[#1f2940] border border-[#2e3d5c] text-[11px] font-bold text-[#00e5ff] shrink-0 cursor-pointer flex items-center gap-1">
+                            <i class="fa-regular fa-copy text-[10px]"></i>
+                            <span id="lbl-copy-sr-id">Копировать</span>
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2 mt-2.5">
+                        <input type="text" id="play-nick-input" maxlength="18" placeholder="Никнейм"
+                               class="input-faceit py-2 px-2.5 text-xs" oninput="handleQuickProfileInput()">
+                        <input type="text" id="play-tag-input" maxlength="24" placeholder="ID / Тэг в игре"
+                               class="input-faceit font-mono-code py-2 px-2.5 text-xs" oninput="handleQuickProfileInput()">
+                    </div>
+                </div>
+
+                <!-- Level Ring, ELO Readout & Stats Strip -->
+                <div class="faceit-card p-3.5">
+                    <div class="flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full border-[3px] border-[#19c37d] bg-[#0e1520] flex items-center justify-center font-cyber text-base font-black text-[#19c37d] shrink-0">
+                                <span id="play-lvl-num">1</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span id="play-elo-val" class="font-cyber text-lg font-black text-white">0</span>
+                                    <span class="px-1.5 py-0.5 rounded bg-rose-500/15 border border-rose-500/40 text-[9px] font-extrabold text-[#ff4655]">ELO</span>
+                                </div>
+                                <div class="w-28 sm:w-32 h-1.5 rounded-full bg-[#1c2234] overflow-hidden mt-1.5">
+                                    <div id="play-elo-bar" class="h-full bg-gradient-to-r from-[#ff2e63] to-[#ff7a45] rounded-full transition-all duration-300" style="width: 0%;"></div>
+                                </div>
+                                <div class="flex items-center justify-between text-[10px] mt-1 font-mono-code">
+                                    <span id="play-elo-progress-txt" class="text-[#7c8aa6]">0 / 150</span>
+                                    <span id="play-elo-next-txt" class="text-[#ff3b6b] font-bold">150 до уровня</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 text-right shrink-0">
+                            <div class="flex items-center justify-end gap-2 text-[11px]">
+                                <span class="text-[#7c8aa6]" id="lbl-stat-rank">Ранг</span>
+                                <span id="play-stat-rank" class="font-mono-code font-bold text-white">#—</span>
+                            </div>
+                            <div class="flex items-center justify-end gap-2 text-[11px]">
+                                <span class="text-[#7c8aa6]">W/R</span>
+                                <span id="play-stat-wr" class="font-mono-code font-bold text-white">0%</span>
+                            </div>
+                            <div class="flex items-center justify-end gap-2 text-[11px]">
+                                <span class="text-[#7c8aa6]">K/D</span>
+                                <span id="play-stat-kd" class="font-mono-code font-bold text-white">0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- League Selector & Main Matchmaking Block -->
+                <div>
+                    <div id="lbl-choose-league" class="text-[10px] font-extrabold uppercase tracking-widest text-[#7c8aa6] mb-2 px-0.5">
+                        ВЫБОР ЛИГИ
+                    </div>
+
+                    <div class="faceit-card p-4">
+                        <div class="flex items-center gap-1.5 mb-3.5">
+                            <button id="league-tab-DEFAULT" onclick="selectLeagueTab('DEFAULT')" class="league-tab-btn active">DEFAULT</button>
+                            <button id="league-tab-QUAL" onclick="selectLeagueTab('QUAL')" class="league-tab-btn">
+                                <i class="fa-solid fa-lock text-[9px] mr-1 opacity-70"></i>QUAL
+                            </button>
+                            <button id="league-tab-PRO" onclick="selectLeagueTab('PRO')" class="league-tab-btn">
+                                <i class="fa-solid fa-lock text-[9px] mr-1 opacity-70"></i>PRO
+                            </button>
+                        </div>
+
+                        <div class="flex items-center justify-between gap-2 mb-1">
+                            <div id="play-league-name" class="font-cyber text-lg font-black text-white">DEFAULT</div>
+                            <span id="play-league-open-pill" class="px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/40 text-[10px] font-extrabold text-[#ff4655] uppercase">
+                                ОТКРЫТА
+                            </span>
+                        </div>
+                        <p id="lbl-mm-desc" class="text-xs text-[#8899b5] mb-3.5">
+                            Открытый рейтинговый матчмейкинг без ботов — ждёт реальных игроков.
+                        </p>
+
+                        <!-- Live Metrics Row -->
+                        <div class="grid grid-cols-3 gap-2 mb-3.5">
+                            <div class="bg-[#0b0e17] border border-[#1b2236] rounded-xl p-2.5">
+                                <div class="text-[9px] font-bold uppercase text-[#7c8aa6] flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-[#00e676] inline-block animate-pulse"></span>
+                                    <span id="lbl-online">ОНЛАЙН</span>
+                                </div>
+                                <div id="counter-online" class="font-cyber text-base font-black text-white mt-1">1</div>
+                            </div>
+                            <div class="bg-[#0b0e17] border border-[#1b2236] rounded-xl p-2.5">
+                                <div class="text-[9px] font-bold uppercase text-[#7c8aa6] flex items-center gap-1">
+                                    <i class="fa-solid fa-magnifying-glass text-[9px]"></i>
+                                    <span id="lbl-searching">В ПОИСКЕ</span>
+                                </div>
+                                <div id="counter-searching" class="font-cyber text-base font-black text-[#ffb800] mt-1">0</div>
+                            </div>
+                            <div class="bg-[#0b0e17] border border-[#1b2236] rounded-xl p-2.5">
+                                <div class="text-[9px] font-bold uppercase text-[#7c8aa6] flex items-center gap-1">
+                                    <i class="fa-solid fa-gamepad text-[9px]"></i>
+                                    <span id="lbl-req-short">СОСТАВ</span>
+                                </div>
+                                <div id="counter-needed" class="font-cyber text-base font-black text-[#00e5ff] mt-1">10</div>
+                            </div>
+                        </div>
+
+                        <!-- Pool Bar -->
+                        <div id="pool-pills-container" class="flex flex-wrap gap-1.5 mb-4"></div>
+
+                        <!-- Party Mode & Slots (Invite by SR Rising ID) -->
+                        <div class="grid grid-cols-3 gap-2 mb-3">
+                            <button id="party-btn-1" onclick="setPartySize(1)" class="party-mode-btn active">Solo (1)</button>
+                            <button id="party-btn-2" onclick="setPartySize(2)" class="party-mode-btn">Duo (2)</button>
+                            <button id="party-btn-3" onclick="setPartySize(3)" class="party-mode-btn">Trio (3)</button>
+                        </div>
+                        <div id="party-slots-container" class="flex items-center justify-center gap-4 my-3"></div>
+
+                        <!-- Primary CTA -->
+                        <button id="btn-start-queue" onclick="beginMatchmakingQueue()" class="btn-faceit-primary w-full py-3.5 text-sm sm:text-base flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                            <span id="lbl-find-match">Найти матч</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Support Bot Masked Link Card -->
+                <div class="faceit-card p-3.5 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <div class="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/35 flex items-center justify-center text-[#ff4655] shrink-0">
+                            <i class="fa-brands fa-telegram text-base"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-xs font-extrabold text-white truncate">SR FACEIT Support</div>
+                            <div class="text-[11px] text-[#8899b5] truncate">Помощь по матчам и спорным протоколам</div>
+                        </div>
+                    </div>
+                    <a href="https://t.me/sr_rising_support_bot" target="_blank" rel="noopener noreferrer"
+                       class="px-3 py-2 rounded-xl bg-[#182032] hover:bg-[#1f2940] border border-[#2e3d5c] text-xs font-bold text-[#00e5ff] shrink-0 transition">
+                        Связаться с нами
+                    </a>
+                </div>
+            </section>
+
+            <!-- VIEW 2: TOP / LEADERBOARD -->
+            <section id="view-ladder" class="app-view hidden anim-enter space-y-3.5">
+                <div class="flex items-center justify-between px-0.5">
+                    <div>
+                        <h2 id="lbl-ladder-title" class="text-lg font-extrabold text-white leading-tight">Лидерборд</h2>
+                        <div id="ladder-discipline-label" class="text-[11px] text-[#8899b5]">Сезон • Standrise (5v5)</div>
+                    </div>
+                    <button onclick="loadTop100Ladder(true)" class="btn-faceit-secondary px-3 py-1.5 text-xs font-bold cursor-pointer">
+                        <i class="fa-solid fa-rotate-right mr-1 text-[#00e5ff]"></i>
+                        <span id="lbl-refresh-ladder">Обновить</span>
+                    </button>
+                </div>
+
+                <!-- Sub-bar -->
+                <div class="faceit-card p-3 flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 rounded-xl bg-rose-500/15 border border-rose-500/35 flex items-center justify-center text-[#ff4655]">
+                            <i class="fa-solid fa-ranking-star text-sm"></i>
+                        </div>
+                        <div>
+                            <div id="lbl-ladder-sub-title" class="text-xs font-extrabold text-white">Рейтинг игроков SR FACEIT</div>
+                            <div id="lbl-ladder-sub-desc" class="text-[10px] text-[#8899b5]">Актуальный зачёт по ELO в реальном времени</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-right text-xs text-[#64748b]"></i>
+                </div>
+
+                <!-- Filter Tabs (DEFAULT, QUAL, PRO, КЛАНЫ) -->
+                <div class="flex items-center justify-between gap-1 bg-[#0d1019] border border-[#1c2236] rounded-2xl p-1">
+                    <button id="ltab-DEFAULT" onclick="setLadderFilter('DEFAULT')" class="league-tab-btn active flex-1">DEFAULT</button>
+                    <button id="ltab-QUAL" onclick="setLadderFilter('QUAL')" class="league-tab-btn flex-1">QUAL</button>
+                    <button id="ltab-PRO" onclick="setLadderFilter('PRO')" class="league-tab-btn flex-1">PRO</button>
+                    <button id="ltab-CLANS" onclick="setLadderFilter('CLANS')" class="league-tab-btn flex-1">КЛАНЫ</button>
+                </div>
+
+                <!-- Top-3 Podium -->
+                <div id="ladder-podium-grid" class="grid grid-cols-3 gap-2.5 items-end pt-4 pb-1"></div>
+
+                <!-- Section Divider -->
+                <div id="lbl-places-4-100" class="text-[10px] font-extrabold uppercase tracking-widest text-[#7c8aa6] px-0.5 pt-1">
+                    МЕСТА 4–100
+                </div>
+
+                <!-- Ranked Rows #4+ -->
+                <div id="ladder-rows-list" class="space-y-2"></div>
+            </section>
+
+            <!-- VIEW 3: MATCH ROOM -->
+            <section id="view-match" class="app-view hidden anim-enter space-y-4">
+                <div class="faceit-card faceit-card-accent p-4 sm:p-5">
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-[#1e283c]">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span id="match-room-id" class="font-cyber text-lg font-black text-white">MATCH #SR-0000</span>
+                                <span id="match-format-pill" class="px-2 py-0.5 rounded bg-rose-500/15 border border-rose-500/40 font-mono-code text-[11px] font-bold text-rose-300">5v5</span>
+                            </div>
+                            <div id="match-room-sub" class="text-xs text-[#8899b5] mt-1">Standrise Competitive</div>
+                        </div>
+                        <div id="match-stage-badge" class="px-3 py-1 rounded-lg bg-[#182032] border border-[#2e3d5c] text-xs font-bold text-[#ffb800]">
+                            VETO
+                        </div>
+                    </div>
+
+                    <!-- Stage 1: Veto -->
+                    <div id="match-stage-veto" class="pt-4">
+                        <div class="flex items-center justify-between gap-2 mb-3">
+                            <p id="veto-turn-text" class="text-xs sm:text-sm font-bold text-[#ffb800]"></p>
+                            <button onclick="autoFinishVeto()" class="text-[11px] font-bold text-[#8899b5] hover:text-white underline cursor-pointer" id="btn-skip-veto">
+                                Случайный бан
+                            </button>
+                        </div>
+                        <div id="veto-cards-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2.5"></div>
+                    </div>
+
+                    <!-- Stage 2: Lobby & Invites -->
+                    <div id="match-stage-lobby" class="hidden pt-4">
+                        <div class="bg-[#07090e] border border-[#1e283c] rounded-xl p-4 mb-4">
+                            <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                <span class="text-xs uppercase tracking-wider font-bold text-[#8899b5]" id="lbl-selected-arena">Выбранная арена / режим</span>
+                                <span id="lobby-chosen-map" class="font-cyber text-sm font-black text-[#00e5ff]">SANDSTONE</span>
+                            </div>
+                            <p id="lobby-desc-text" class="text-xs text-[#8899b5] mb-4">
+                                Капитан-хост создает комнату в игре и приглашает всех участников по их ID / Тэгу.
+                            </p>
+
+                            <div id="host-invite-panel" class="hidden space-y-2">
+                                <div id="host-banner-txt" class="text-xs font-bold text-[#ffb800] uppercase tracking-wider mb-2">
+                                    👑 Вы капитан-хост — создайте комнату в игре и пригласите участников по ID:
+                                </div>
+                                <div id="host-players-list" class="space-y-2"></div>
+                            </div>
+
+                            <div id="guest-wait-panel" class="bg-[#121724] border border-[#2e3d5c] rounded-xl p-4 text-center">
+                                <div id="guest-wait-title" class="text-sm font-bold text-[#00e5ff]">
+                                    Ожидание приглашения в лобби от капитана-хоста...
+                                </div>
+                                <p id="guest-wait-sub" class="text-xs text-[#8899b5] mt-1">
+                                    Будьте готовы в игре — капитан отправит приглашение по вашему ID/Тэгу.
+                                </p>
+                            </div>
+
+                            <!-- Reporter-Only Match Data Entry Room -->
+                            <div id="reporter-data-room" class="hidden mt-4 bg-[#0d111a] border-2 border-[#ffb800]/60 rounded-2xl p-4 text-left">
+                                <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-4 border-b border-[#1e283c]">
+                                    <div>
+                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#ffb800]/15 border border-[#ffb800]/40 text-[#ffb800] text-[10px] font-extrabold uppercase tracking-wider">
+                                            <i class="fa-solid fa-clipboard-check"></i>
+                                            <span id="lbl-reporter-badge">Комната ввода данных (Выбранный репортёр)</span>
+                                        </span>
+                                        <h4 id="lbl-reporter-room-title" class="font-display text-lg font-bold uppercase text-white mt-1.5">
+                                            Ввод данных матча для всех участников (включая себя)
+                                        </h4>
+                                    </div>
+                                    <span id="lbl-auto-elo-note" class="font-mono-code text-[11px] text-[#00e676]">
+                                        Система сама считает ELO и ранг
+                                    </span>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label id="lbl-winner-select" class="block text-[11px] font-bold uppercase tracking-wider text-[#8899b5] mb-1.5">
+                                        Победитель матча (ничьи нет)
+                                    </label>
+                                    <select id="reporter-winner-select" class="input-faceit font-bold">
+                                        <option value="alpha">Team Alpha — Victory (+ELO)</option>
+                                        <option value="bravo">Team Bravo — Victory (+ELO)</option>
+                                    </select>
+                                </div>
+
+                                <div id="reporter-players-rows" class="space-y-2.5 mb-4"></div>
+
+                                <button type="button" onclick="submitReporterMatchData()" id="btn-submit-reporter-data" class="btn-faceit-primary w-full py-3.5 text-sm cursor-pointer" style="background: linear-gradient(135deg, #00e676, #059669); color: #07090e; box-shadow: 0 6px 22px rgba(0, 230, 118, 0.28);">
+                                    <i class="fa-solid fa-calculator mr-2"></i>
+                                    <span id="lbl-calc-and-save">Рассчитать ELO и сохранить итог</span>
+                                </button>
+                            </div>
+
+                            <!-- Non-Reporter Status & Support Dispute Box -->
+                            <div id="non-reporter-status-box" class="hidden mt-4 bg-[#0d111a] border border-[#1e283c] rounded-2xl p-4">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div>
+                                        <div id="lbl-reporter-waiting-title" class="text-xs sm:text-sm font-bold text-white">
+                                            Ввод данных доступен только выбранному репортёру лобби
+                                        </div>
+                                        <p id="lbl-reporter-waiting-sub" class="text-xs text-[#8899b5] mt-0.5">
+                                            Репортёр вводит K/D и направление +/- ELO; система автоматически считает итоговое ELO каждого аккаунта. При ошибке можно подать жалобу в поддержку.
+                                        </p>
+                                    </div>
+                                    <button type="button" onclick="openSupportDisputeModal()" class="btn-faceit-secondary px-3.5 py-2.5 text-xs font-bold text-rose-400 border-rose-500/40 hover:border-rose-500 shrink-0 cursor-pointer">
+                                        <i class="fa-solid fa-headset mr-1.5"></i>
+                                        <span id="btn-report-support-txt">В поддержку</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-2.5">
+                            <button id="btn-open-reporter-modal" onclick="openResultModal()" class="hidden btn-faceit-primary flex-1 py-3.5 px-5 text-sm cursor-pointer" style="background: linear-gradient(135deg, #00e676, #059669); color: #07090e; box-shadow: 0 6px 22px rgba(0, 230, 118, 0.28);">
+                                <i class="fa-solid fa-flag-checkered mr-2"></i>
+                                <span id="lbl-report-result">Завершить матч и ввести счет</span>
+                            </button>
+                            <button type="button" onclick="openSupportDisputeModal()" class="btn-faceit-secondary py-3.5 px-4 text-xs font-bold text-[#ffb800] border-[#ffb800]/35 hover:border-[#ffb800] cursor-pointer">
+                                <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>
+                                <span id="lbl-dispute-btn">Жалоба в поддержку</span>
+                            </button>
+                            <button onclick="leaveMatchToPlay()" class="btn-faceit-secondary py-3.5 px-4 text-xs font-bold cursor-pointer" id="lbl-exit-match">
+                                Покинуть комнату
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stage 3: Final Scoreboard -->
+                    <div id="match-stage-result" class="hidden pt-4">
+                        <div class="text-center py-3 mb-4 bg-[#07090e] border border-[#1e283c] rounded-xl">
+                            <div id="lbl-protocol-published" class="text-[11px] font-extrabold uppercase tracking-wider text-[#00e676]">
+                                Итоговый протокол матча
+                            </div>
+                            <div id="result-score-display" class="font-cyber text-3xl font-black text-white my-1.5">13 : 9</div>
+                            <div id="result-elo-change" class="font-mono-code text-xs sm:text-sm font-bold text-[#ffb800]">+25 ELO</div>
+                            <div id="result-reporter-meta" class="text-[11px] text-[#8899b5] mt-1"></div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                                <thead>
+                                    <tr class="border-b border-[#1e283c] text-[#8899b5] text-[11px] uppercase">
+                                        <th class="py-2 px-2">Player</th>
+                                        <th class="py-2 px-2 text-center">K/D</th>
+                                        <th class="py-2 px-2 text-center">Δ ELO</th>
+                                        <th class="py-2 px-2 text-right">ELO</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="result-scoreboard-tbody"></tbody>
+                            </table>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-2.5 mt-4">
+                            <button onclick="openSupportDisputeModal()" class="btn-faceit-secondary py-3.5 px-4 text-xs font-bold text-rose-400 border-rose-500/35 hover:border-rose-500 cursor-pointer" id="lbl-dispute-after">
+                                Оспорить данные в поддержке
+                            </button>
+                            <button onclick="leaveMatchToPlay()" class="btn-faceit-primary flex-1 py-3.5 text-sm cursor-pointer" id="lbl-back-to-play">
+                                Вернуться на главную
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Rosters -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div class="faceit-card p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-display text-lg font-bold uppercase text-[#ffb800]">Team Alpha</h3>
+                            <span id="alpha-avg-elo" class="font-mono-code text-xs text-[#8899b5]">AVG 0 ELO</span>
+                        </div>
+                        <div id="roster-alpha-list" class="space-y-2"></div>
+                    </div>
+
+                    <div class="faceit-card p-4">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-display text-lg font-bold uppercase text-[#ff4655]">Team Bravo</h3>
+                            <span id="bravo-avg-elo" class="font-mono-code text-xs text-[#8899b5]">AVG 0 ELO</span>
+                        </div>
+                        <div id="roster-bravo-list" class="space-y-2"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- VIEW 4: PROFILE -->
+            <section id="view-profile" class="app-view hidden anim-enter space-y-4">
+                <div class="faceit-card faceit-card-accent p-4 sm:p-5">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 pb-5 border-b border-[#1e283c]">
+                        <label class="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-[#ff4655] to-[#ff5500] flex items-center justify-center cursor-pointer overflow-hidden shadow-lg shadow-rose-500/25 shrink-0 group">
+                            <span id="profile-avatar-letter" class="font-cyber text-3xl font-black text-white">P</span>
+                            <img id="profile-avatar-img" src="" alt="Avatar" class="hidden w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/55 opacity-0 group-hover:opacity-100 flex items-center justify-center transition text-white text-xs font-bold">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <input type="file" accept="image/*" class="hidden" onchange="handleAvatarFile(event)">
+                        </label>
+
+                        <div class="text-center sm:text-left flex-1 min-w-0">
+                            <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                                <h2 id="profile-nick-display" class="font-cyber text-xl font-black text-white truncate">Player</h2>
+                                <span id="profile-lvl-badge" class="lvl-badge lvl-1">1</span>
+                            </div>
+                            <div class="font-mono-code text-xs text-[#8899b5] mt-1">
+                                Game ID: <span id="profile-tag-display" class="text-[#00e5ff]">000000</span>
+                            </div>
+                            <div class="flex items-center justify-center sm:justify-start gap-2 mt-1.5 flex-wrap">
+                                <button type="button" onclick="copySrRisingId(this)" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#0b0e17] border border-cyan-500/40 font-mono-code text-xs font-bold text-[#00e5ff] cursor-pointer">
+                                    <span>SR Rising ID: <strong id="profile-sr-rising-id">000000</strong></span>
+                                    <i class="fa-regular fa-copy text-[10px]"></i>
+                                </button>
+                                <span id="profile-game-badge" class="px-2.5 py-1 rounded-md bg-[#182032] border border-[#2e3d5c] text-[11px] font-bold text-[#ffb800]">Standrise</span>
+                                <span id="profile-lang-badge" class="px-2.5 py-1 rounded-md bg-[#182032] border border-[#2e3d5c] text-[11px] font-bold text-[#8899b5]">RU</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 my-4">
+                        <div class="bg-[#07090e] border border-[#1e283c] rounded-xl p-3 text-center">
+                            <div id="profile-stat-elo" class="font-cyber text-lg font-black text-[#ff4655]">0</div>
+                            <div id="stat-lbl-elo" class="text-[11px] text-[#8899b5] mt-0.5">Рейтинг ELO</div>
+                        </div>
+                        <div class="bg-[#07090e] border border-[#1e283c] rounded-xl p-3 text-center">
+                            <div id="profile-stat-wr" class="font-cyber text-lg font-black text-[#00e676]">0.0%</div>
+                            <div id="stat-lbl-wr" class="text-[11px] text-[#8899b5] mt-0.5">Винрейт</div>
+                        </div>
+                        <div class="bg-[#07090e] border border-[#1e283c] rounded-xl p-3 text-center">
+                            <div id="profile-stat-kd" class="font-cyber text-lg font-black text-[#00e5ff]">0.00</div>
+                            <div class="text-[11px] text-[#8899b5] mt-0.5">K/D</div>
+                        </div>
+                        <div class="bg-[#07090e] border border-[#1e283c] rounded-xl p-3 text-center">
+                            <div id="profile-stat-matches" class="font-cyber text-lg font-black text-white">0</div>
+                            <div id="stat-lbl-matches" class="text-[11px] text-[#8899b5] mt-0.5">Матчи</div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row gap-2.5 mb-3">
+                        <button onclick="quickToggleGame()" class="btn-faceit-secondary flex-1 py-3 px-4 text-xs font-bold cursor-pointer">
+                            <i class="fa-solid fa-repeat mr-1.5 text-[#ffb800]"></i>
+                            <span id="lbl-switch-discipline">Сменить дисциплину</span>
+                        </button>
+                        <button onclick="openOnboardingReset()" class="btn-faceit-secondary flex-1 py-3 px-4 text-xs font-bold cursor-pointer">
+                            <i class="fa-solid fa-sliders mr-1.5 text-[#ff4655]"></i>
+                            <span id="lbl-reset-setup">Язык и выбор игры</span>
+                        </button>
+                    </div>
+
+                    <a href="https://t.me/sr_rising_support_bot" target="_blank" rel="noopener noreferrer"
+                       class="w-full py-3 px-4 rounded-xl bg-[#141b2d] hover:bg-[#1b243c] border border-[#2b395c] flex items-center justify-center gap-2 text-xs font-extrabold text-[#00e5ff] transition">
+                        <i class="fa-brands fa-telegram text-sm"></i>
+                        <span id="lbl-contact-us-profile">Связаться с нами</span>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="fixed bottom-0 inset-x-0 z-40 bg-[#0b0d15]/95 backdrop-blur-md border-t border-[#1c2236] px-2 py-1.5">
+            <div class="max-w-xl mx-auto flex items-center justify-around">
+                <button data-nav="ladder" onclick="switchView('ladder')" class="nav-item-btn cursor-pointer">
+                    <i class="fa-solid fa-trophy text-sm"></i>
+                    <span id="nav-ladder-txt">Топ</span>
+                </button>
+                <button data-nav="play" onclick="switchView('play')" class="nav-item-btn active cursor-pointer">
+                    <i class="fa-solid fa-crosshairs text-sm"></i>
+                    <span id="nav-play-txt">Играть</span>
+                </button>
+                <button data-nav="profile" onclick="switchView('profile')" class="nav-item-btn cursor-pointer">
+                    <i class="fa-regular fa-user text-sm"></i>
+                    <span id="nav-profile-txt">Профиль</span>
+                </button>
+                <a href="https://t.me/sr_rising_support_bot" target="_blank" rel="noopener noreferrer" class="nav-item-btn">
+                    <i class="fa-solid fa-headset text-sm"></i>
+                    <span id="nav-support-txt">Связаться с нами</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- INVITE TEAMMATE BY SR RISING ID MODAL -->
+    <div id="modal-invite" class="fixed inset-0 z-[170] hidden items-center justify-center p-4 bg-[#07090e]/85 backdrop-blur-sm">
+        <div class="faceit-card faceit-card-accent anim-enter w-full max-w-sm p-6">
+            <h3 id="invite-modal-title" class="font-display text-2xl font-bold uppercase text-white mb-1">Пригласить по SR Rising ID</h3>
+            <p id="invite-modal-desc" class="text-xs text-[#8899b5] mb-4">Введите числовой SR Rising ID игрока, чтобы добавить его в пати</p>
+            <input type="text" inputmode="numeric" pattern="[0-9]*" id="invite-tag-input" maxlength="10" placeholder="Например: 482910" class="input-faceit font-mono-code text-base tracking-wider mb-4">
+            <div class="flex gap-2.5">
+                <button onclick="closeInviteModal()" id="btn-cancel-invite" class="btn-faceit-secondary flex-1 py-3 text-xs font-bold cursor-pointer">Отмена</button>
+                <button onclick="confirmPartyInvite()" id="btn-confirm-invite" class="btn-faceit-primary flex-1 py-3 text-xs cursor-pointer">Пригласить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUEUE SEARCH OVERLAY -->
+    <div id="overlay-queue" class="fixed inset-0 z-[160] hidden items-center justify-center p-4 bg-[#07090e]/90">
+        <div class="faceit-card faceit-card-accent anim-enter w-full max-w-sm p-6 text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-rose-500/15 border border-rose-500/40 text-[#ff4655] mb-3" style="animation: pulseGlow 1.8s infinite;">
+                <i class="fa-solid fa-radar text-xl"></i>
+            </div>
+            <h3 id="queue-modal-title" class="font-cyber text-lg font-black text-white">ЖИВОЙ ПОИСК МАТЧА</h3>
+            <p id="queue-modal-status" class="text-xs text-[#8899b5] mt-1">Подключение к очереди Firestore...</p>
+            <div id="queue-roster-progress" class="font-mono-code text-sm font-bold text-[#ffb800] mt-2">
+                1 / 10 реальных игроков в очереди
+            </div>
+            <div id="queue-elapsed-timer" class="font-cyber text-3xl font-black text-white my-3">00:00</div>
+            <p id="queue-live-note" class="text-[11px] text-[#8899b5] mb-4">
+                Без ботов и фейков: комната создастся автоматически, когда наберется полный состав.
+            </p>
+            <button onclick="cancelMatchmakingQueue()" class="btn-faceit-secondary w-full py-3 text-xs font-bold cursor-pointer" id="btn-cancel-queue">
+                Отменить поиск
+            </button>
+        </div>
+    </div>
+
+    <!-- READY CHECK OVERLAY -->
+    <div id="overlay-ready" class="fixed inset-0 z-[175] hidden items-center justify-center p-4 bg-[#07090e]/92 backdrop-blur-sm">
+        <div class="faceit-card faceit-card-accent anim-enter w-full max-w-sm p-6 text-center">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/15 border border-emerald-400/40 text-[#00e676] mb-3">
+                <i class="fa-solid fa-check-double text-xl"></i>
+            </div>
+            <h3 id="ready-modal-title" class="font-cyber text-lg font-black text-white">СОСТАВ НАБРАН!</h3>
+            <p id="ready-modal-desc" class="text-xs text-[#8899b5] mt-1.5 mb-5">
+                Подтвердите готовность для входа в общую комнату и вето
+            </p>
+            <button onclick="acceptFoundMatch()" class="btn-faceit-primary w-full py-3.5 text-sm cursor-pointer">
+                <span id="btn-accept-match-txt">ПРИНЯТЬ МАТЧ</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- SUBMIT RESULT MODAL (Reporter Only) -->
+    <div id="modal-result" class="fixed inset-0 z-[180] hidden items-center justify-center p-4 bg-[#07090e]/88 backdrop-blur-sm">
+        <div class="faceit-card anim-enter w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-3">
+                <h3 id="res-modal-title" class="font-display text-2xl font-bold uppercase text-white">Итог матча</h3>
+                <button onclick="closeResultModal()" class="text-[#8899b5] hover:text-white cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <form onsubmit="submitMatchScore(event)" class="space-y-3">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-[#ffb800] mb-1">Team Alpha Score</label>
+                        <input type="number" id="score-alpha-input" min="0" max="50" value="13" required class="input-faceit font-cyber text-center text-lg">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold uppercase text-[#ff4655] mb-1">Team Bravo Score</label>
+                        <input type="number" id="score-bravo-input" min="0" max="50" value="9" required class="input-faceit font-cyber text-center text-lg">
+                    </div>
+                </div>
+
+                <div id="modal-reporter-roster-inputs" class="space-y-2 pt-2 border-t border-[#1e283c]"></div>
+
+                <button type="submit" id="btn-publish-score" class="btn-faceit-primary w-full py-3.5 mt-2 text-sm cursor-pointer">
+                    Опубликовать результат
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- SUPPORT DISPUTE MODAL -->
+    <div id="modal-support" class="fixed inset-0 z-[190] hidden items-center justify-center p-4 bg-[#07090e]/88 backdrop-blur-sm">
+        <div class="faceit-card faceit-card-accent anim-enter w-full max-w-md p-6">
+            <div class="flex items-center justify-between mb-3">
+                <h3 id="support-modal-title" class="font-display text-2xl font-bold uppercase text-white">
+                    Жалоба в поддержку SR FACEIT
+                </h3>
+                <button onclick="closeSupportDisputeModal()" class="text-[#8899b5] hover:text-white cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <p id="support-modal-desc" class="text-xs text-[#8899b5] mb-3 leading-relaxed">
+                Если ответственный игрок ввёл неверные данные или нарушил честность протокола, отправьте тикет с ID матча — система зафиксирует жалобу и отстранит ненадёжного репортёра.
+            </p>
+
+            <form onsubmit="submitSupportDispute(event)" class="space-y-3">
+                <div>
+                    <label id="lbl-support-match-id" class="block text-[11px] font-bold uppercase text-[#8899b5] mb-1">ID Матча</label>
+                    <input type="text" id="support-match-id-input" required readonly class="input-faceit font-mono-code text-sm text-[#00e5ff]">
+                </div>
+                <div>
+                    <label id="lbl-support-reason" class="block text-[11px] font-bold uppercase text-[#8899b5] mb-1">Причина обращения</label>
+                    <textarea id="support-reason-input" rows="3" required placeholder="Неверно указан счёт, K/D или знак ELO..." class="input-faceit text-xs sm:text-sm"></textarea>
+                </div>
+                <button type="submit" id="btn-send-support" class="btn-faceit-primary w-full py-3.5 text-sm cursor-pointer">
+                    Отправить в поддержку и откинуть репортёра
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0xeUM1scAiXZ3G9prnhJ7EuH0PY0NiRU",
+            authDomain: "sr-rising-1cb90.firebaseapp.com",
+            projectId: "sr-rising-1cb90",
+            storageBucket: "sr-rising-1cb90.firebasestorage.app",
+            messagingSenderId: "769783095723",
+            appId: "1:769783095723:web:ada9709e84b242eb4cb2ee"
+        };
+
+        let db = null;
+        let firestoreAvailable = true;
+
+        try {
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            db = firebase.firestore();
+        } catch (err) {
+            firestoreAvailable = false;
+            console.warn("Firebase initialization fallback:", err);
+        }
+
+        const TRANSLATIONS = {
+            ru: {
+                onboardLangSub: "Выберите язык веб-сайта / Select website language",
+                nextBtn: "Продолжить",
+                onboardGameSub: "Выберите дисциплину веб-платформы SR FACEIT",
+                backBtn: "Назад",
+                enterHubBtn: "Открыть SR FACEIT",
+                online: "ОНЛАЙН",
+                searching: "В ПОИСКЕ",
+                reqShort: "СОСТАВ",
+                chooseLeague: "ВЫБОР ЛИГИ",
+                leagueOpen: "ОТКРЫТА",
+                mmDesc: "Открытый рейтинговый матчмейкинг без ботов — ждёт реальных игроков.",
+                findMatch: "Найти матч",
+                navPlay: "Играть",
+                navLadder: "Топ",
+                navProfile: "Профиль",
+                contactUs: "Связаться с нами",
+                ladderTitle: "Лидерборд",
+                ladderSubTitle: "Рейтинг игроков SR FACEIT",
+                ladderSubDesc: "Актуальный зачёт по ELO в реальном времени",
+                places4to100: "МЕСТА 4–100",
+                refresh: "Обновить",
+                statRank: "Ранг",
+                statElo: "Рейтинг ELO",
+                statWinrate: "Винрейт",
+                statMatches: "Матчи",
+                toLevelSuffix: "до уровня",
+                switchDiscipline: "Сменить дисциплину",
+                resetSetup: "Язык и выбор игры",
+                inviteTitle: "Пригласить по SR Rising ID",
+                inviteDesc: "Введите числовой SR Rising ID игрока, чтобы добавить его в пати",
+                cancel: "Отмена",
+                add: "Пригласить",
+                queueTitle: "ЖИВОЙ ПОИСК МАТЧА",
+                queueSearching: "В очереди ({game}): {current} / {needed} игроков — ждём реальных игроков...",
+                queueProgress: "{current} / {needed} реальных игроков в очереди",
+                queueLiveNote: "Без ботов и фейков: комната создастся автоматически, когда наберется полный состав.",
+                readyTitle: "СОСТАВ НАБРАН!",
+                readyDesc: "Подтвердите готовность для входа в общую комнату и вето",
+                acceptMatch: "ПРИНЯТЬ МАТЧ",
+                resultModalTitle: "Итог матча",
+                publishScore: "Опубликовать результат",
+                selectedArena: "Выбранная арена / режим",
+                lobbyDesc: "Капитан-хост создает комнату в игре и приглашает всех участников по их ID / Тэгу.",
+                hostBanner: "👑 Вы капитан-хост — создайте комнату в игре и пригласите участников по ID:",
+                guestWaitTitle: "Ожидание приглашения в лобби от капитана-хоста...",
+                guestWaitSub: "Будьте готовы в игре — капитан отправит приглашение по вашему ID/Тэгу.",
+                reportResult: "Завершить матч и ввести счет",
+                exitMatch: "Покинуть комнату",
+                protocolPublished: "Итоговый протокол матча",
+                backToPlay: "Вернуться на главную",
+                yourTurnBan: "Ход Team Alpha ({cap}): выберите {item} для бана",
+                opponentBan: "Ход Team Bravo ({cap}): ожидание бана в реальном времени...",
+                skipVeto: "Случайный бан",
+                mapWord: "карту",
+                modeWord: "режим",
+                needNickTag: "Введите никнейм и игровой ID / Тэг!",
+                mateAdded: "Игрок {nick} (SR ID: {srid}) добавлен в пати",
+                enterMateTag: "Введите числовой SR Rising ID (например 482910)",
+                cannotInviteSelf: "Нельзя пригласить свой собственный SR Rising ID!",
+                alreadyInParty: "Этот SR Rising ID уже добавлен в пати!",
+                noDraws: "Ничья невозможна — укажите победителя!",
+                winToast: "Победа! {delta} ELO",
+                lossToast: "Поражение. {delta} ELO",
+                copied: "ID скопирован",
+                srIdCopied: "SR Rising ID скопирован: {id}",
+                copyBtn: "Копировать",
+                avatarUpdated: "Аватар обновлен",
+                youTag: "(Вы)",
+                capTag: "👑 CAP",
+                readyTag: "В пати",
+                freeSlot: "Слот",
+                youSlot: "Вы",
+                firestoreRequired: "Для живого онлайна и поиска нужен доступ к Firestore",
+                reporterBadge: "Комната ввода данных (Выбранный репортёр)",
+                reporterRoomTitle: "Ввод данных матча для всех участников (включая себя)",
+                autoEloNote: "Система сама считает ELO и ранг",
+                winnerSelect: "Победитель матча (ничьи нет)",
+                calcAndSave: "Рассчитать ELO и сохранить итог",
+                reporterWaitingTitle: "Ввод данных доступен только выбранному репортёру лобби",
+                reporterWaitingSub: "Репортёр вводит K/D и направление +/- ELO; система автоматически считает итоговое ELO каждого аккаунта. При ошибке можно подать жалобу в поддержку.",
+                reportSupportTxt: "В поддержку",
+                disputeBtn: "Жалоба в поддержку",
+                disputeAfter: "Оспорить данные в поддержке",
+                supportSent: "Жалоба отправлена в поддержку. Ненадёжный репортёр отстранён.",
+                reporterOnlyAlert: "Вводить данные матча может только выбранный репортёр этого лобби!",
+                ladderRefreshed: "Ладдер обновлён"
+            },
+            en: {
+                onboardLangSub: "Select website language / Выберите язык веб-сайта",
+                nextBtn: "Continue",
+                onboardGameSub: "Select discipline for live SR FACEIT matchmaking",
+                backBtn: "Back",
+                enterHubBtn: "Open SR FACEIT",
+                online: "ONLINE",
+                searching: "IN QUEUE",
+                reqShort: "ROSTER",
+                chooseLeague: "LEAGUE SELECT",
+                leagueOpen: "OPEN",
+                mmDesc: "Live competitive matchmaking with zero bots — waits for real players.",
+                findMatch: "Find Match",
+                navPlay: "Play",
+                navLadder: "Top",
+                navProfile: "Profile",
+                contactUs: "Contact Us",
+                ladderTitle: "Leaderboard",
+                ladderSubTitle: "SR FACEIT Player Rankings",
+                ladderSubDesc: "Live ELO standings in real time",
+                places4to100: "PLACES 4–100",
+                refresh: "Refresh",
+                statRank: "Rank",
+                statElo: "ELO Rating",
+                statWinrate: "Winrate",
+                statMatches: "Matches",
+                toLevelSuffix: "to level",
+                switchDiscipline: "Switch Discipline",
+                resetSetup: "Language & Game Setup",
+                inviteTitle: "Invite by SR Rising ID",
+                inviteDesc: "Enter a player's numeric SR Rising ID to invite them to your party",
+                cancel: "Cancel",
+                add: "Invite",
+                queueTitle: "LIVE MATCHMAKING QUEUE",
+                queueSearching: "In queue ({game}): {current} / {needed} players — waiting for real players...",
+                queueProgress: "{current} / {needed} real players in queue",
+                queueLiveNote: "No bots or fake matches: the room is created automatically once enough real players queue up.",
+                readyTitle: "LOBBY READY!",
+                readyDesc: "Confirm readiness to enter the shared match room and veto",
+                acceptMatch: "ACCEPT MATCH",
+                resultModalTitle: "Match Result",
+                publishScore: "Publish Result",
+                selectedArena: "Selected Arena / Mode",
+                lobbyDesc: "The host captain creates the in-game lobby and invites all players using their Game ID / Tag.",
+                hostBanner: "👑 You are Host Captain — create the in-game lobby and invite players by ID:",
+                guestWaitTitle: "Waiting for lobby invite from Host Captain...",
+                guestWaitSub: "Be ready in-game — the captain will invite you using your ID/Tag.",
+                reportResult: "Finish Match & Enter Score",
+                exitMatch: "Leave Room",
+                protocolPublished: "Match Scoreboard Published",
+                backToPlay: "Back to Home",
+                yourTurnBan: "Team Alpha turn ({cap}): pick a {item} to ban",
+                opponentBan: "Team Bravo turn ({cap}): waiting for live ban...",
+                skipVeto: "Ban random",
+                mapWord: "map",
+                modeWord: "mode",
+                needNickTag: "Please enter both Nickname and Game ID / Tag!",
+                mateAdded: "Player {nick} (SR ID: {srid}) added to party",
+                enterMateTag: "Enter a valid numeric SR Rising ID (e.g. 482910)",
+                cannotInviteSelf: "You cannot invite your own SR Rising ID!",
+                alreadyInParty: "This SR Rising ID is already in your party!",
+                noDraws: "Ties are not allowed — enter a decisive score!",
+                winToast: "Victory! {delta} ELO",
+                lossToast: "Defeat. {delta} ELO",
+                copied: "ID copied",
+                srIdCopied: "SR Rising ID copied: {id}",
+                copyBtn: "Copy",
+                avatarUpdated: "Avatar updated",
+                youTag: "(You)",
+                capTag: "👑 CAP",
+                readyTag: "In Party",
+                freeSlot: "Open",
+                youSlot: "You",
+                firestoreRequired: "Firestore access is required for live online and matchmaking",
+                reporterBadge: "Match Data Room (Assigned Reporter)",
+                reporterRoomTitle: "Enter Match Data for All Players (Including Yourself)",
+                autoEloNote: "System auto-calculates final ELO",
+                winnerSelect: "Winning Team (No draws)",
+                calcAndSave: "Calculate ELO & Save Result",
+                reporterWaitingTitle: "Only the randomly selected lobby reporter can enter match data",
+                reporterWaitingSub: "The reporter enters K/D and +/- ELO direction while the system calculates each player's final ELO. Report to support with match ID if data is inaccurate.",
+                reportSupportTxt: "Support",
+                disputeBtn: "Report to Support",
+                disputeAfter: "Dispute Result in Support",
+                supportSent: "Support report submitted. Unreliable reporter dismissed.",
+                reporterOnlyAlert: "Only the assigned match reporter can enter match data!",
+                ladderRefreshed: "Leaderboard refreshed"
+            }
+        };
+
+        const STANDRISE_POOL = ['ZONE 9', 'SANDSTONE', 'SAKURA', 'BREEZE', 'RUST'];
+        const BRAWLSTARS_POOL = ['Броулбол', 'Горячая зона', 'Захват кристаллов', 'Нокаут', 'Награда'];
+        const STORAGE_KEY = 'sr_faceit_user_v2';
+        const LEGACY_STORAGE_KEY = 'sr_faceit_user_v1';
+
+        let pendingLang = 'ru';
+        let pendingGame = 'Standrise';
+
+        function generateNumericSrRisingId() {
+            // Permanent 6-digit numeric SR Rising ID (100000 - 999999)
+            return String(Math.floor(100000 + Math.random() * 900000));
+        }
+
+        let player = {
+            uid: 'sr_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now().toString(36),
+            srRisingId: generateNumericSrRisingId(),
+            nick: '',
+            uidtag: '',
+            lang: 'ru',
+            game: 'Standrise',
+            elo: 0,
+            matches: 0,
+            wins: 0,
+            losses: 0,
+            kd: 0.00,
+            avatar: ''
+        };
+
+        let selectedLeague = 'DEFAULT';
+        let ladderFilter = 'DEFAULT';
+        let partySize = 1;
+        let partyMembers = [null, null];
+        let inviteSlotIndex = 0;
+
+        let queueTimerInterval = null;
+        let queueWatcherUnsub = null;
+        let currentMatchId = null;
+        let currentMatchUnsub = null;
+        let activeMatch = null;
+        let pendingReadyMatch = null;
+        let cachedLadderEntries = [];
+
+        function t(key, vars = {}) {
+            const langMap = TRANSLATIONS[player.lang] || TRANSLATIONS.ru;
+            let str = langMap[key] || TRANSLATIONS.ru[key] || key;
+            Object.keys(vars).forEach(k => {
+                str = str.replace(`{${k}}`, vars[k]);
+            });
+            return str;
+        }
+
+        function showToast(message) {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast-banner';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-6px)';
+                toast.style.transition = 'all 0.2s ease';
+                setTimeout(() => toast.remove(), 220);
+            }, 3000);
+        }
+
+        function computeSkillLevel(elo) {
+            if (elo >= 2100) return 10;
+            if (elo >= 1800) return 9;
+            if (elo >= 1500) return 8;
+            if (elo >= 1200) return 7;
+            if (elo >= 950) return 6;
+            if (elo >= 700) return 5;
+            if (elo >= 500) return 4;
+            if (elo >= 300) return 3;
+            if (elo >= 150) return 2;
+            return 1;
+        }
+
+        function getLevelThresholds(elo) {
+            const safeElo = Math.max(0, Number(elo || 0));
+            const bounds = [0, 150, 300, 500, 700, 950, 1200, 1500, 1800, 2100, 2500];
+            for (let i = 0; i < bounds.length - 1; i++) {
+                if (safeElo < bounds[i + 1]) {
+                    const span = bounds[i + 1] - bounds[i];
+                    const currentInSpan = safeElo - bounds[i];
+                    const remaining = bounds[i + 1] - safeElo;
+                    const pct = Math.min(100, Math.max(0, Math.round((currentInSpan / span) * 100)));
+                    return { currentInSpan, span, remaining, pct };
+                }
+            }
+            return { currentInSpan: 400, span: 400, remaining: 0, pct: 100 };
+        }
+
+        function getRequiredPlayerCount(game) {
+            return game === 'Standrise' ? 10 : 6;
+        }
+
+        function savePlayerLocal() {
+            try {
+                if (!player.srRisingId || !/^\d{6}$/.test(String(player.srRisingId))) {
+                    player.srRisingId = generateNumericSrRisingId();
+                }
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(player));
+            } catch (e) {
+                console.warn("localStorage save failed:", e);
+            }
+        }
+
+        // Always syncs account to Firestore `users` so newly created accounts immediately enter the Top-100 ladder
+        async function syncPlayerFirestore() {
+            if (!db || !firestoreAvailable) return;
+            if (!player.srRisingId || !/^\d{6}$/.test(String(player.srRisingId))) {
+                player.srRisingId = generateNumericSrRisingId();
+                savePlayerLocal();
+            }
+            const effectiveNick = (player.nick || '').trim() || `Player_${player.srRisingId.slice(-4)}`;
+            try {
+                await db.collection('users').doc(player.uid).set({
+                    uid: player.uid,
+                    srRisingId: String(player.srRisingId),
+                    nick: effectiveNick,
+                    uidtag: (player.uidtag || '').trim() || player.srRisingId,
+                    lang: player.lang || 'ru',
+                    game: player.game || 'Standrise',
+                    elo: Math.max(0, Number(player.elo || 0)),
+                    matches: Math.max(0, Number(player.matches || 0)),
+                    wins: Math.max(0, Number(player.wins || 0)),
+                    losses: Math.max(0, Number(player.losses || 0)),
+                    kd: Math.max(0, Number(player.kd || 0)),
+                    avatar: player.avatar || '',
+                    updatedAt: Date.now()
+                }, { merge: true });
+            } catch (e) {
+                console.warn("Firestore user sync warning:", e);
+            }
+        }
+
+        function copySrRisingId(btnEl) {
+            const val = String(player.srRisingId || '000000');
+            try {
+                const temp = document.createElement('textarea');
+                temp.value = val;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+            } catch (e) {}
+            if (btnEl) {
+                const origHtml = btnEl.innerHTML;
+                btnEl.innerHTML = `<i class="fa-solid fa-check text-[#00e676]"></i> <span>✓</span>`;
+                setTimeout(() => { btnEl.innerHTML = origHtml; }, 1400);
+            }
+            showToast(t('srIdCopied', { id: val }));
+        }
+
+        // Onboarding handlers
+        function chooseOnboardingLang(lang) {
+            pendingLang = lang;
+            player.lang = lang;
+            document.getElementById('lang-opt-ru').classList.toggle('active', lang === 'ru');
+            document.getElementById('lang-opt-en').classList.toggle('active', lang === 'en');
+            applyLanguageStrings();
+        }
+
+        function advanceToGameStep() {
+            player.lang = pendingLang;
+            savePlayerLocal();
+            applyLanguageStrings();
+            document.getElementById('onboarding-lang').classList.add('hidden');
+            const gameScreen = document.getElementById('onboarding-game');
+            gameScreen.classList.remove('hidden');
+            gameScreen.classList.add('flex');
+        }
+
+        function backToLangStep() {
+            document.getElementById('onboarding-game').classList.add('hidden');
+            document.getElementById('onboarding-game').classList.remove('flex');
+            document.getElementById('onboarding-lang').classList.remove('hidden');
+        }
+
+        function chooseOnboardingGame(game) {
+            pendingGame = game;
+            document.getElementById('game-opt-Standrise').classList.toggle('active', game === 'Standrise');
+            document.getElementById('game-opt-Brawlstars').classList.toggle('active', game === 'Brawlstars');
+        }
+
+        async function completeOnboarding() {
+            player.lang = pendingLang;
+            player.game = pendingGame;
+            savePlayerLocal();
+            await syncPlayerFirestore();
+
+            document.getElementById('onboarding-game').classList.add('hidden');
+            document.getElementById('onboarding-game').classList.remove('flex');
+            document.getElementById('onboarding-lang').classList.add('hidden');
+            launchApp();
+        }
+
+        function openOnboardingReset() {
+            pendingLang = player.lang || 'ru';
+            pendingGame = player.game || 'Standrise';
+            chooseOnboardingLang(pendingLang);
+            chooseOnboardingGame(pendingGame);
+            document.getElementById('onboarding-game').classList.add('hidden');
+            document.getElementById('onboarding-game').classList.remove('flex');
+            document.getElementById('onboarding-lang').classList.remove('hidden');
+        }
+
+        async function quickToggleGame() {
+            player.game = player.game === 'Standrise' ? 'Brawlstars' : 'Standrise';
+            pendingGame = player.game;
+            savePlayerLocal();
+            await syncPlayerFirestore();
+            applyLanguageStrings();
+            updatePlayHubCards();
+            renderPoolPills();
+            renderProfileView();
+            startRealtimeListeners();
+            loadTop100Ladder();
+            showToast(`${player.game} (${player.game === 'Standrise' ? '5v5' : '3v3'})`);
+        }
+
+        function selectLeagueTab(league) {
+            selectedLeague = league;
+            ['DEFAULT', 'QUAL', 'PRO'].forEach(l => {
+                const btn = document.getElementById('league-tab-' + l);
+                if (btn) btn.classList.toggle('active', l === league);
+            });
+            document.getElementById('play-league-name').textContent = league;
+        }
+
+        function applyLanguageStrings() {
+            const isStandrise = player.game === 'Standrise';
+            const formatText = isStandrise ? '5v5' : '3v3';
+
+            document.documentElement.lang = player.lang || 'ru';
+            document.getElementById('onboard-lang-sub').textContent = t('onboardLangSub');
+            document.getElementById('btn-next-game').textContent = t('nextBtn');
+            document.getElementById('onboard-game-sub').textContent = t('onboardGameSub');
+            document.getElementById('btn-enter-hub').textContent = t('enterHubBtn');
+
+            document.getElementById('hdr-game-pill').textContent = `${player.game} • ${formatText}`;
+            document.getElementById('play-disc-badge').textContent = formatText;
+            document.getElementById('counter-needed').textContent = getRequiredPlayerCount(player.game);
+            document.getElementById('play-disc-icon').className = isStandrise
+                ? 'fa-solid fa-crosshairs text-lg'
+                : 'fa-solid fa-trophy text-lg text-[#ffb800]';
+
+            document.getElementById('lbl-copy-sr-id').textContent = t('copyBtn');
+            document.getElementById('lbl-online').textContent = t('online');
+            document.getElementById('lbl-searching').textContent = t('searching');
+            document.getElementById('lbl-req-short').textContent = t('reqShort');
+            document.getElementById('lbl-choose-league').textContent = t('chooseLeague');
+            document.getElementById('play-league-open-pill').textContent = t('leagueOpen');
+            document.getElementById('lbl-mm-desc').textContent = t('mmDesc');
+            document.getElementById('lbl-find-match').textContent = t('findMatch');
+            document.getElementById('lbl-stat-rank').textContent = t('statRank');
+
+            document.getElementById('play-nick-input').placeholder = player.lang === 'en' ? 'Nickname' : 'Никнейм';
+            document.getElementById('play-tag-input').placeholder = player.lang === 'en' ? 'In-Game ID / Tag' : 'ID / Тэг в игре';
+
+            document.getElementById('nav-play-txt').textContent = t('navPlay');
+            document.getElementById('nav-ladder-txt').textContent = t('navLadder');
+            document.getElementById('nav-profile-txt').textContent = t('navProfile');
+            document.getElementById('nav-support-txt').textContent = t('contactUs');
+            document.getElementById('lbl-contact-us-profile').textContent = t('contactUs');
+
+            document.getElementById('lbl-ladder-title').textContent = t('ladderTitle');
+            document.getElementById('lbl-ladder-sub-title').textContent = t('ladderSubTitle');
+            document.getElementById('lbl-ladder-sub-desc').textContent = t('ladderSubDesc');
+            document.getElementById('lbl-places-4-100').textContent = t('places4to100');
+            document.getElementById('lbl-refresh-ladder').textContent = t('refresh');
+
+            document.getElementById('stat-lbl-elo').textContent = t('statElo');
+            document.getElementById('stat-lbl-wr').textContent = t('statWinrate');
+            document.getElementById('stat-lbl-matches').textContent = t('statMatches');
+            document.getElementById('lbl-switch-discipline').textContent = t('switchDiscipline');
+            document.getElementById('lbl-reset-setup').textContent = t('resetSetup');
+
+            document.getElementById('invite-modal-title').textContent = t('inviteTitle');
+            document.getElementById('invite-modal-desc').textContent = t('inviteDesc');
+            document.getElementById('btn-cancel-invite').textContent = t('cancel');
+            document.getElementById('btn-confirm-invite').textContent = t('add');
+
+            document.getElementById('queue-modal-title').textContent = t('queueTitle');
+            document.getElementById('queue-live-note').textContent = t('queueLiveNote');
+            document.getElementById('btn-cancel-queue').textContent = t('cancel');
+            document.getElementById('ready-modal-title').textContent = t('readyTitle');
+            document.getElementById('ready-modal-desc').textContent = t('readyDesc');
+            document.getElementById('btn-accept-match-txt').textContent = t('acceptMatch');
+
+            document.getElementById('res-modal-title').textContent = t('resultModalTitle');
+            document.getElementById('btn-publish-score').textContent = t('publishScore');
+
+            document.getElementById('lbl-selected-arena').textContent = t('selectedArena');
+            document.getElementById('lobby-desc-text').textContent = t('lobbyDesc');
+            document.getElementById('host-banner-txt').textContent = t('hostBanner');
+            document.getElementById('guest-wait-title').textContent = t('guestWaitTitle');
+            document.getElementById('guest-wait-sub').textContent = t('guestWaitSub');
+            document.getElementById('lbl-report-result').textContent = t('reportResult');
+            document.getElementById('lbl-exit-match').textContent = t('exitMatch');
+            document.getElementById('lbl-protocol-published').textContent = t('protocolPublished');
+            document.getElementById('lbl-back-to-play').textContent = t('backToPlay');
+            document.getElementById('btn-skip-veto').textContent = t('skipVeto');
+
+            document.getElementById('lbl-reporter-badge').textContent = t('reporterBadge');
+            document.getElementById('lbl-reporter-room-title').textContent = t('reporterRoomTitle');
+            document.getElementById('lbl-auto-elo-note').textContent = t('autoEloNote');
+            document.getElementById('lbl-winner-select').textContent = t('winnerSelect');
+            document.getElementById('lbl-calc-and-save').textContent = t('calcAndSave');
+            document.getElementById('lbl-reporter-waiting-title').textContent = t('reporterWaitingTitle');
+            document.getElementById('lbl-reporter-waiting-sub').textContent = t('reporterWaitingSub');
+            document.getElementById('btn-report-support-txt').textContent = t('reportSupportTxt');
+            document.getElementById('lbl-dispute-btn').textContent = t('disputeBtn');
+            document.getElementById('lbl-dispute-after').textContent = t('disputeAfter');
+        }
+
+        async function launchApp() {
+            const shell = document.getElementById('app-shell');
+            shell.classList.remove('hidden');
+            shell.classList.add('flex');
+
+            document.getElementById('play-nick-input').value = player.nick || '';
+            document.getElementById('play-tag-input').value = player.uidtag || '';
+
+            applyLanguageStrings();
+            updatePlayHubCards();
+            renderPartySlots();
+            renderPoolPills();
+            renderProfileView();
+
+            await syncPlayerFirestore();
+            startRealtimeListeners();
+            loadTop100Ladder();
+        }
+
+        let _profileSyncDebounce = null;
+        function handleQuickProfileInput() {
+            const nickEl = document.getElementById('play-nick-input');
+            const tagEl = document.getElementById('play-tag-input');
+
+            player.nick = nickEl.value.trim();
+            player.uidtag = tagEl.value.trim();
+
+            if (player.nick) nickEl.classList.remove('input-error');
+            if (player.uidtag) tagEl.classList.remove('input-error');
+
+            savePlayerLocal();
+            updatePlayHubCards();
+            renderPartySlots();
+            renderProfileView();
+
+            if (_profileSyncDebounce) clearTimeout(_profileSyncDebounce);
+            _profileSyncDebounce = setTimeout(() => {
+                syncPlayerFirestore();
+                if (window._presencePingNow) window._presencePingNow();
+            }, 350);
+        }
+
+        function updatePlayHubCards() {
+            const eloVal = Math.max(0, Number(player.elo || 0));
+            const matchesVal = Math.max(0, Number(player.matches || 0));
+            const winsVal = Math.max(0, Number(player.wins || 0));
+            const kdVal = Math.max(0, Number(player.kd || 0));
+            const wr = matchesVal > 0 ? `${Math.round((winsVal / matchesVal) * 100)}%` : '0%';
+            const lvl = computeSkillLevel(eloVal);
+            const thresholds = getLevelThresholds(eloVal);
+
+            document.getElementById('play-card-title').textContent = `${player.game} Ranking`;
+            document.getElementById('play-card-nick').textContent = player.nick || `Player_${player.srRisingId.slice(-4)}`;
+            document.getElementById('play-card-id').textContent = player.uidtag || '000000';
+            document.getElementById('play-sr-rising-id').textContent = player.srRisingId;
+
+            document.getElementById('play-lvl-num').textContent = lvl;
+            document.getElementById('play-elo-val').textContent = eloVal;
+            document.getElementById('play-elo-bar').style.width = `${thresholds.pct}%`;
+            document.getElementById('play-elo-progress-txt').textContent = `${thresholds.currentInSpan} / ${thresholds.span}`;
+            document.getElementById('play-elo-next-txt').textContent = `${thresholds.remaining} ${t('toLevelSuffix')}`;
+
+            document.getElementById('play-stat-wr').textContent = wr;
+            document.getElementById('play-stat-kd').textContent = kdVal.toFixed(2);
+        }
+
+        function switchView(viewName) {
+            document.querySelectorAll('.app-view').forEach(v => {
+                v.classList.add('hidden');
+                v.classList.remove('block');
+            });
+            const target = document.getElementById('view-' + viewName);
+            if (target) {
+                target.classList.remove('hidden');
+                target.classList.add('block');
+            }
+
+            const titleMap = {
+                play: t('navPlay'),
+                ladder: t('ladderTitle'),
+                match: 'MATCH ROOM',
+                profile: t('navProfile')
+            };
+            document.getElementById('hdr-screen-title').textContent = titleMap[viewName] || t('navPlay');
+
+            document.querySelectorAll('.nav-item-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.nav === viewName);
+            });
+
+            if (viewName === 'ladder') {
+                syncPlayerFirestore().then(() => loadTop100Ladder());
+            }
+            if (viewName === 'profile') renderProfileView();
+        }
+
+        function renderPoolPills() {
+            const container = document.getElementById('pool-pills-container');
+            if (!container) return;
+            const pool = player.game === 'Standrise' ? STANDRISE_POOL : BRAWLSTARS_POOL;
+            container.innerHTML = pool.map(item => `
+                <span class="px-2.5 py-1 rounded-lg bg-[#0b0e17] border border-[#1d253b] text-[10px] font-bold text-[#c6d1e6]">
+                    ${item}
+                </span>
+            `).join('');
+        }
+
+        // Party slots (Invite by SR Rising ID)
+        function setPartySize(size) {
+            partySize = size;
+            [1, 2, 3].forEach(n => {
+                document.getElementById('party-btn-' + n).classList.toggle('active', n === size);
+            });
+            if (size === 1) partyMembers = [null, null];
+            if (size === 2) partyMembers[1] = null;
+            renderPartySlots();
+        }
+
+        function removePartyMate(idx) {
+            partyMembers[idx] = null;
+            renderPartySlots();
+        }
+
+        function renderPartySlots() {
+            const box = document.getElementById('party-slots-container');
+            if (!box) return;
+
+            const avatarLetter = player.nick ? player.nick[0].toUpperCase() : 'P';
+            const avatarStyle = player.avatar
+                ? `background-image: url('${player.avatar}'); background-size: cover; background-position: center;`
+                : 'background: linear-gradient(135deg, #ff4655, #ff5500);';
+
+            let html = `
+                <div class="flex flex-col items-center gap-1 w-22">
+                    <div class="w-12 h-12 rounded-2xl border-2 border-[#ff4655] flex items-center justify-center font-cyber text-sm font-black text-white" style="${avatarStyle}">
+                        ${player.avatar ? '' : avatarLetter}
+                    </div>
+                    <div class="text-[11px] font-bold text-white truncate w-20 text-center">${player.nick || 'Player'}</div>
+                    <div class="font-mono-code text-[9px] font-bold text-[#00e676]">SR ${player.srRisingId}</div>
+                </div>
+            `;
+
+            for (let i = 0; i < partySize - 1; i++) {
+                const mate = partyMembers[i];
+                if (mate) {
+                    html += `
+                        <div onclick="removePartyMate(${i})" class="flex flex-col items-center gap-1 w-22 cursor-pointer" title="Убрать из пати">
+                            <div class="w-12 h-12 rounded-2xl border-2 border-[#00e5ff] bg-[#182032] flex items-center justify-center font-cyber text-sm font-black text-[#00e5ff]">
+                                ${mate.nick[0].toUpperCase()}
+                            </div>
+                            <div class="text-[11px] font-bold text-white truncate w-20 text-center">${mate.nick}</div>
+                            <div class="font-mono-code text-[9px] font-bold text-[#00e5ff]">SR ${mate.srRisingId}</div>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div onclick="openInviteModal(${i})" class="flex flex-col items-center gap-1 w-22 cursor-pointer group">
+                            <div class="w-12 h-12 rounded-2xl border-2 border-dashed border-[#2e3d5c] group-hover:border-[#ff4655] bg-[#07090e] flex items-center justify-center text-[#8899b5] group-hover:text-[#ff4655] transition">
+                                <i class="fa-solid fa-plus text-sm"></i>
+                            </div>
+                            <div class="text-[11px] font-semibold text-[#8899b5] truncate w-20 text-center">${t('freeSlot')}</div>
+                            <div class="text-[9px] text-[#586882]">+ SR ID</div>
+                        </div>
+                    `;
+                }
+            }
+
+            box.innerHTML = html;
+        }
+
+        function openInviteModal(slotIdx) {
+            inviteSlotIndex = slotIdx;
+            document.getElementById('invite-tag-input').value = '';
+            const modal = document.getElementById('modal-invite');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeInviteModal() {
+            const modal = document.getElementById('modal-invite');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function confirmPartyInvite() {
+            const raw = document.getElementById('invite-tag-input').value.trim();
+            const cleanSrId = raw.replace(/\D/g, '');
+            if (!cleanSrId || cleanSrId.length < 4) {
+                showToast(t('enterMateTag'));
+                return;
+            }
+            if (cleanSrId === String(player.srRisingId)) {
+                showToast(t('cannotInviteSelf'));
+                return;
+            }
+            if (partyMembers.some((m, idx) => m && idx !== inviteSlotIndex && String(m.srRisingId) === cleanSrId)) {
+                showToast(t('alreadyInParty'));
+                return;
+            }
+
+            let foundUser = null;
+            if (db && firestoreAvailable) {
+                try {
+                    const snap = await db.collection('users')
+                        .where('srRisingId', '==', cleanSrId)
+                        .limit(1)
+                        .get();
+                    if (!snap.empty) {
+                        foundUser = snap.docs[0].data();
+                    }
+                } catch (e) {}
+            }
+
+            if (foundUser) {
+                partyMembers[inviteSlotIndex] = {
+                    uid: foundUser.uid,
+                    srRisingId: String(foundUser.srRisingId || cleanSrId),
+                    nick: foundUser.nick || `Player_${cleanSrId.slice(-4)}`,
+                    uidtag: foundUser.uidtag || cleanSrId,
+                    elo: Number(foundUser.elo || 0)
+                };
+            } else {
+                partyMembers[inviteSlotIndex] = {
+                    uid: 'sr_mate_' + cleanSrId,
+                    srRisingId: cleanSrId,
+                    nick: `SR_${cleanSrId}`,
+                    uidtag: cleanSrId,
+                    elo: Number(player.elo || 0)
+                };
+            }
+
+            const added = partyMembers[inviteSlotIndex];
+            closeInviteModal();
+            renderPartySlots();
+            showToast(t('mateAdded', { nick: added.nick, srid: added.srRisingId }));
+        }
+
+        // Fixed Real-Time Presence, Queue Counters, and Live Leaderboard Listeners
+        function startRealtimeListeners() {
+            if (!db || !firestoreAvailable) {
+                document.getElementById('counter-online').textContent = '1';
+                document.getElementById('counter-searching').textContent = '0';
+                return;
+            }
+
+            const writePresence = () => {
+                db.collection('presence').doc(player.uid).set({
+                    uid: player.uid,
+                    srRisingId: String(player.srRisingId),
+                    game: player.game,
+                    nick: player.nick || `Player_${player.srRisingId.slice(-4)}`,
+                    lastSeen: Date.now()
+                }, { merge: true }).catch(() => {});
+            };
+
+            window._presencePingNow = writePresence;
+            writePresence();
+
+            if (window._presenceHeartbeat) clearInterval(window._presenceHeartbeat);
+            window._presenceHeartbeat = setInterval(writePresence, 10000);
+
+            if (window._unsubPresence) window._unsubPresence();
+            window._unsubPresence = db.collection('presence').onSnapshot(snap => {
+                const cutoff = Date.now() - 60000;
+                const uniqueOnlineUids = new Set([player.uid]);
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d && (!d.lastSeen || Number(d.lastSeen) >= cutoff)) {
+                        uniqueOnlineUids.add(d.uid || doc.id);
+                    }
+                });
+                document.getElementById('counter-online').textContent = Math.max(1, uniqueOnlineUids.size);
+            }, err => {
+                console.warn("Presence listener error:", err);
+                document.getElementById('counter-online').textContent = '1';
+            });
+
+            if (window._unsubQueue) window._unsubQueue();
+            window._unsubQueue = db.collection('queue').onSnapshot(snap => {
+                const cutoff = Date.now() - 240000;
+                let searchingForGame = 0;
+                snap.forEach(doc => {
+                    const d = doc.data();
+                    if (d && d.game === player.game && (!d.joinedAt || Number(d.joinedAt) >= cutoff)) {
+                        searchingForGame += Number(d.partyCount || 1);
+                    }
+                });
+                document.getElementById('counter-searching').textContent = searchingForGame;
+            }, err => {
+                console.warn("Queue listener error:", err);
+            });
+
+            // Live subscription to `users` collection so new friend accounts immediately show up in ladder
+            if (window._unsubUsersLadder) window._unsubUsersLadder();
+            window._unsubUsersLadder = db.collection('users').onSnapshot(snap => {
+                const list = [];
+                snap.forEach(doc => {
+                    const data = doc.data();
+                    if (data && data.uid) {
+                        list.push(data);
+                    }
+                });
+                cachedLadderEntries = list;
+                renderLadderFromEntries(cachedLadderEntries);
+            }, err => {
+                console.warn("Users ladder listener error:", err);
+            });
+
+            if (window._unsubMyMatches) window._unsubMyMatches();
+            window._unsubMyMatches = db.collection('matches')
+                .where('game', '==', player.game)
+                .onSnapshot(snap => {
+                    snap.forEach(doc => {
+                        const m = doc.data();
+                        if (!m || m.stage === 'finished' || m.stage === 'cancelled') return;
+                        const allIds = [...(m.alpha || []), ...(m.bravo || [])].map(p => p.uid);
+                        if (allIds.includes(player.uid) && currentMatchId !== m.id && !pendingReadyMatch) {
+                            stopQueueListeners();
+                            hideQueueOverlay();
+                            pendingReadyMatch = m;
+                            openReadyCheckOverlay();
+                        }
+                    });
+                }, () => {});
+
+            if (!window._unloadHookAttached) {
+                window._unloadHookAttached = true;
+                window.addEventListener('beforeunload', () => {
+                    if (db) {
+                        db.collection('presence').doc(player.uid).delete().catch(() => {});
+                        db.collection('queue').doc(player.uid).delete().catch(() => {});
+                    }
+                });
+            }
+        }
+
+        function validatePlayerIdentity() {
+            const nickEl = document.getElementById('play-nick-input');
+            const tagEl = document.getElementById('play-tag-input');
+
+            player.nick = (nickEl ? nickEl.value : player.nick || '').trim();
+            player.uidtag = (tagEl ? tagEl.value : player.uidtag || '').trim();
+
+            let invalid = false;
+            if (!player.nick) {
+                if (nickEl) nickEl.classList.add('input-error');
+                invalid = true;
+            } else if (nickEl) {
+                nickEl.classList.remove('input-error');
+            }
+
+            if (!player.uidtag) {
+                if (tagEl) tagEl.classList.add('input-error');
+                invalid = true;
+            } else if (tagEl) {
+                tagEl.classList.remove('input-error');
+            }
+
+            if (invalid) {
+                showToast(t('needNickTag'));
+                return false;
+            }
+
+            savePlayerLocal();
+            syncPlayerFirestore();
+            return true;
+        }
+
+        // Live Matchmaking Queue
+        async function beginMatchmakingQueue() {
+            if (!validatePlayerIdentity()) return;
+            if (!db || !firestoreAvailable) {
+                showToast(t('firestoreRequired'));
+                return;
+            }
+
+            const activeMates = partyMembers.filter(Boolean);
+            const partyPayload = [
+                {
+                    uid: player.uid,
+                    srRisingId: String(player.srRisingId),
+                    nick: player.nick,
+                    uidtag: player.uidtag,
+                    elo: Number(player.elo || 0),
+                    isSelf: true
+                },
+                ...activeMates.map(m => ({
+                    uid: m.uid,
+                    srRisingId: String(m.srRisingId || ''),
+                    nick: m.nick,
+                    uidtag: m.uidtag,
+                    elo: Number(m.elo || player.elo || 0),
+                    isSelf: false
+                }))
+            ];
+
+            const neededTotal = getRequiredPlayerCount(player.game);
+            const overlay = document.getElementById('overlay-queue');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+
+            let seconds = 0;
+            let latestCount = partyPayload.length;
+            document.getElementById('queue-elapsed-timer').textContent = '00:00';
+            document.getElementById('queue-roster-progress').textContent = t('queueProgress', {
+                current: latestCount,
+                needed: neededTotal
+            });
+            document.getElementById('queue-modal-status').textContent = t('queueSearching', {
+                game: player.game,
+                current: latestCount,
+                needed: neededTotal
+            });
+
+            try {
+                await db.collection('queue').doc(player.uid).set({
+                    uid: player.uid,
+                    srRisingId: String(player.srRisingId),
+                    nick: player.nick,
+                    uidtag: player.uidtag,
+                    elo: Number(player.elo || 0),
+                    game: player.game,
+                    league: selectedLeague,
+                    partyCount: partyPayload.length,
+                    members: partyPayload.map(p => ({
+                        uid: p.uid,
+                        srRisingId: p.srRisingId,
+                        nick: p.nick,
+                        uidtag: p.uidtag,
+                        elo: Number(p.elo || 0)
+                    })),
+                    joinedAt: Date.now()
+                });
+            } catch (e) {
+                showToast(t('firestoreRequired'));
+                hideQueueOverlay();
+                return;
+            }
+
+            if (queueWatcherUnsub) queueWatcherUnsub();
+            queueWatcherUnsub = db.collection('queue')
+                .where('game', '==', player.game)
+                .onSnapshot(async snap => {
+                    const cutoff = Date.now() - 240000;
+                    const queuedEntries = [];
+                    snap.forEach(doc => {
+                        const data = doc.data();
+                        if (data && data.uid && (!data.joinedAt || Number(data.joinedAt) >= cutoff)) {
+                            queuedEntries.push(data);
+                        }
+                    });
+
+                    queuedEntries.sort((a, b) => Number(a.joinedAt || 0) - Number(b.joinedAt || 0));
+
+                    const poolPlayers = [];
+                    const seenUids = new Set();
+                    for (const entry of queuedEntries) {
+                        const members = Array.isArray(entry.members) && entry.members.length > 0
+                            ? entry.members
+                            : [{ uid: entry.uid, srRisingId: entry.srRisingId || '', nick: entry.nick, uidtag: entry.uidtag, elo: entry.elo || 0 }];
+                        for (const m of members) {
+                            if (!seenUids.has(m.uid)) {
+                                seenUids.add(m.uid);
+                                poolPlayers.push({
+                                    uid: m.uid,
+                                    srRisingId: m.srRisingId || '',
+                                    nick: m.nick || 'Player',
+                                    uidtag: m.uidtag || '000000',
+                                    elo: Number(m.elo || 0)
+                                });
+                            }
+                        }
+                    }
+
+                    latestCount = Math.min(neededTotal, poolPlayers.length);
+                    document.getElementById('queue-roster-progress').textContent = t('queueProgress', {
+                        current: latestCount,
+                        needed: neededTotal
+                    });
+                    document.getElementById('queue-modal-status').textContent = t('queueSearching', {
+                        game: player.game,
+                        current: latestCount,
+                        needed: neededTotal
+                    });
+
+                    if (poolPlayers.length >= neededTotal && currentMatchId === null && !pendingReadyMatch) {
+                        const selected = poolPlayers.slice(0, neededTotal);
+                        if (selected[0] && selected[0].uid === player.uid) {
+                            await createSharedMatchFromRealPlayers(selected);
+                        }
+                    }
+                }, () => {});
+
+            if (queueTimerInterval) clearInterval(queueTimerInterval);
+            queueTimerInterval = setInterval(() => {
+                seconds++;
+                const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
+                const ss = String(Math.floor(seconds % 60)).padStart(2, '0');
+                document.getElementById('queue-elapsed-timer').textContent = `${mm}:${ss}`;
+            }, 1000);
+        }
+
+        function hideQueueOverlay() {
+            const overlay = document.getElementById('overlay-queue');
+            overlay.classList.add('hidden');
+            overlay.classList.remove('flex');
+        }
+
+        function stopQueueListeners() {
+            if (queueTimerInterval) {
+                clearInterval(queueTimerInterval);
+                queueTimerInterval = null;
+            }
+            if (queueWatcherUnsub) {
+                queueWatcherUnsub();
+                queueWatcherUnsub = null;
+            }
+            if (db && firestoreAvailable) {
+                db.collection('queue').doc(player.uid).delete().catch(() => {});
+            }
+        }
+
+        function cancelMatchmakingQueue() {
+            stopQueueListeners();
+            hideQueueOverlay();
+        }
+
+        function openReadyCheckOverlay() {
+            const readyOverlay = document.getElementById('overlay-ready');
+            readyOverlay.classList.remove('hidden');
+            readyOverlay.classList.add('flex');
+        }
+
+        async function acceptFoundMatch() {
+            const readyOverlay = document.getElementById('overlay-ready');
+            readyOverlay.classList.add('hidden');
+            readyOverlay.classList.remove('flex');
+
+            if (!pendingReadyMatch) return;
+            const matchObj = pendingReadyMatch;
+            pendingReadyMatch = null;
+            await attachToSharedMatch(matchObj.id, matchObj);
+        }
+
+        async function createSharedMatchFromRealPlayers(realPlayers) {
+            const teamSize = player.game === 'Standrise' ? 5 : 3;
+            const pool = player.game === 'Standrise' ? STANDRISE_POOL : BRAWLSTARS_POOL;
+
+            const sortedByElo = [...realPlayers].sort((a, b) => Number(b.elo || 0) - Number(a.elo || 0));
+            const alpha = [];
+            const bravo = [];
+
+            sortedByElo.forEach((p, idx) => {
+                if (alpha.length < teamSize && (idx % 2 === 0 || bravo.length >= teamSize)) {
+                    alpha.push({ ...p });
+                } else if (bravo.length < teamSize) {
+                    bravo.push({ ...p });
+                }
+            });
+
+            const assignCaptain = team => {
+                if (!team.length) return { uid: '', nick: 'Captain' };
+                let capIdx = 0;
+                team.forEach((p, idx) => {
+                    p.isCaptain = false;
+                    if (Number(p.elo || 0) > Number(team[capIdx].elo || 0)) capIdx = idx;
+                });
+                team[capIdx].isCaptain = true;
+                return team[capIdx];
+            };
+
+            const capA = assignCaptain(alpha);
+            const capB = assignCaptain(bravo);
+            const hostCaptain = Math.random() < 0.5 ? capA : capB;
+
+            const fullLobbyPlayers = [...alpha, ...bravo];
+            const selectedReporter = fullLobbyPlayers[Math.floor(Math.random() * fullLobbyPlayers.length)] || hostCaptain;
+
+            const matchDocId = 'SR-' + Math.floor(1000 + Math.random() * 9000);
+            const matchData = {
+                id: matchDocId,
+                game: player.game,
+                league: selectedLeague,
+                teamSize,
+                alpha,
+                bravo,
+                capANick: capA.nick,
+                capBNick: capB.nick,
+                hostUid: hostCaptain.uid,
+                hostNick: hostCaptain.nick,
+                reporterUid: selectedReporter.uid,
+                reporterNick: selectedReporter.nick,
+                dismissedReporters: [],
+                vetoTurn: 'A',
+                stage: 'veto',
+                items: pool.map(name => ({ name, banned: false })),
+                chosenMap: null,
+                createdAt: Date.now()
+            };
+
+            try {
+                await db.collection('matches').doc(matchDocId).set(matchData);
+                await Promise.all(
+                    realPlayers.map(p => db.collection('queue').doc(p.uid).delete().catch(() => {}))
+                );
+            } catch (e) {}
+        }
+
+        async function attachToSharedMatch(matchId, initialData) {
+            stopQueueListeners();
+            currentMatchId = matchId;
+            activeMatch = normalizeMatchForViewer(initialData);
+
+            document.getElementById('hdr-match-return-btn').classList.remove('hidden');
+            document.getElementById('hdr-match-return-btn').classList.add('inline-flex');
+            switchView('match');
+            renderMatchRoom();
+
+            if (currentMatchUnsub) currentMatchUnsub();
+            if (db && firestoreAvailable) {
+                currentMatchUnsub = db.collection('matches').doc(matchId).onSnapshot(doc => {
+                    if (!doc.exists || !activeMatch) return;
+                    activeMatch = normalizeMatchForViewer(doc.data());
+                    renderMatchRoom();
+                }, () => {});
+            }
+        }
+
+        function normalizeMatchForViewer(raw) {
+            const alpha = (raw.alpha || []).map(p => ({ ...p, isSelf: p.uid === player.uid }));
+            const bravo = (raw.bravo || []).map(p => ({ ...p, isSelf: p.uid === player.uid }));
+            return { ...raw, alpha, bravo };
+        }
+
+        function renderMatchRoom() {
+            if (!activeMatch) return;
+
+            document.getElementById('match-room-id').textContent = `MATCH #${activeMatch.id}`;
+            document.getElementById('match-format-pill').textContent = `${activeMatch.teamSize}v${activeMatch.teamSize}`;
+            document.getElementById('match-room-sub').textContent = `${activeMatch.game} • Reporter: ${activeMatch.reporterNick || activeMatch.hostNick}`;
+
+            const renderTeamRoster = (list, elId, avgId) => {
+                const container = document.getElementById(elId);
+                const avg = list.length
+                    ? Math.round(list.reduce((acc, p) => acc + Number(p.elo || 0), 0) / list.length)
+                    : 0;
+                document.getElementById(avgId).textContent = `AVG ${avg} ELO`;
+
+                container.innerHTML = list.map(p => {
+                    const isReporter = p.uid === activeMatch.reporterUid;
+                    return `
+                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#07090e] border ${p.isSelf ? 'border-[#ff4655]/60' : 'border-[#1e283c]'}">
+                            <div class="min-w-0 pr-2">
+                                <div class="flex items-center gap-1.5 flex-wrap">
+                                    <span class="text-xs sm:text-sm font-bold ${p.isSelf ? 'text-[#ffb800]' : 'text-white'} truncate">
+                                        ${p.nick}
+                                    </span>
+                                    ${p.isCaptain ? `<span class="text-[10px] font-extrabold text-[#ffb800]">${t('capTag')}</span>` : ''}
+                                    ${isReporter ? `<span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">REPORTER</span>` : ''}
+                                </div>
+                                <div class="font-mono-code text-[11px] text-[#8899b5]">Game ID: ${p.uidtag}${p.srRisingId ? ` • SR ${p.srRisingId}` : ''}</div>
+                            </div>
+                            <div class="font-mono-code text-xs font-bold text-[#ff4655] shrink-0">
+                                ${p.elo} ELO
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            };
+
+            renderTeamRoster(activeMatch.alpha, 'roster-alpha-list', 'alpha-avg-elo');
+            renderTeamRoster(activeMatch.bravo, 'roster-bravo-list', 'bravo-avg-elo');
+
+            const isCurrentUserReporter = activeMatch.reporterUid === player.uid;
+
+            if (activeMatch.stage === 'finished' && activeMatch.finalScore) {
+                document.getElementById('match-stage-veto').classList.add('hidden');
+                document.getElementById('match-stage-lobby').classList.add('hidden');
+                document.getElementById('match-stage-result').classList.remove('hidden');
+                document.getElementById('match-stage-badge').textContent = 'FINISHED';
+                renderCompletedScoreboard();
+                return;
+            }
+
+            const remaining = (activeMatch.items || []).filter(i => !i.banned);
+            if (remaining.length <= 1 || activeMatch.stage === 'lobby') {
+                activeMatch.stage = 'lobby';
+                activeMatch.chosenMap = remaining[0] ? remaining[0].name : activeMatch.items[0].name;
+
+                document.getElementById('match-stage-veto').classList.add('hidden');
+                document.getElementById('match-stage-result').classList.add('hidden');
+                document.getElementById('match-stage-lobby').classList.remove('hidden');
+                document.getElementById('match-stage-badge').textContent = 'LOBBY';
+                document.getElementById('lobby-chosen-map').textContent = activeMatch.chosenMap;
+
+                const amIHost = activeMatch.hostUid === player.uid;
+                const hostPanel = document.getElementById('host-invite-panel');
+                const guestPanel = document.getElementById('guest-wait-panel');
+
+                if (amIHost) {
+                    hostPanel.classList.remove('hidden');
+                    guestPanel.classList.add('hidden');
+                    const targets = [...activeMatch.alpha, ...activeMatch.bravo].filter(p => !p.isSelf);
+                    document.getElementById('host-players-list').innerHTML = targets.map(p => `
+                        <div class="flex items-center justify-between p-2.5 rounded-xl bg-[#121724] border border-[#2e3d5c]">
+                            <div class="text-xs sm:text-sm">
+                                <strong class="text-white">${p.nick}</strong>
+                                <span class="font-mono-code text-xs text-[#00e5ff] ml-2">${p.uidtag}</span>
+                            </div>
+                            <button onclick="copyPlayerId('${p.uidtag}', this)" class="px-2.5 py-1 rounded-lg bg-[#182032] hover:bg-[#1f2940] border border-[#2e3d5c] text-xs font-bold text-[#ffb800] cursor-pointer">
+                                ${t('copyBtn')}
+                            </button>
+                        </div>
+                    `).join('');
+                } else {
+                    hostPanel.classList.add('hidden');
+                    guestPanel.classList.remove('hidden');
+                    document.getElementById('guest-wait-title').textContent = `${t('guestWaitTitle')} (${activeMatch.hostNick})`;
+                }
+
+                const reporterRoom = document.getElementById('reporter-data-room');
+                const nonReporterBox = document.getElementById('non-reporter-status-box');
+                const modalTriggerBtn = document.getElementById('btn-open-reporter-modal');
+
+                if (isCurrentUserReporter) {
+                    reporterRoom.classList.remove('hidden');
+                    nonReporterBox.classList.add('hidden');
+                    modalTriggerBtn.classList.remove('hidden');
+                    renderInlineReporterForm();
+                } else {
+                    reporterRoom.classList.add('hidden');
+                    nonReporterBox.classList.remove('hidden');
+                    modalTriggerBtn.classList.add('hidden');
+                }
+                return;
+            }
+
+            // Veto stage
+            document.getElementById('match-stage-veto').classList.remove('hidden');
+            document.getElementById('match-stage-lobby').classList.add('hidden');
+            document.getElementById('match-stage-result').classList.add('hidden');
+            document.getElementById('match-stage-badge').textContent = 'VETO';
+
+            const itemWord = activeMatch.game === 'Standrise' ? t('mapWord') : t('modeWord');
+            const capName = activeMatch.vetoTurn === 'A'
+                ? (activeMatch.capANick || 'Captain A')
+                : (activeMatch.capBNick || 'Captain B');
+
+            document.getElementById('veto-turn-text').textContent = activeMatch.vetoTurn === 'A'
+                ? t('yourTurnBan', { cap: capName, item: itemWord })
+                : t('opponentBan', { cap: capName });
+
+            document.getElementById('veto-cards-grid').innerHTML = (activeMatch.items || []).map(item => `
+                <div onclick="userBanItem('${item.name.replace(/'/g, "\\'")}')" class="map-veto-card ${item.banned ? 'banned' : ''}">
+                    <div class="font-cyber text-xs sm:text-sm font-extrabold text-white">${item.name}</div>
+                    <div class="text-[10px] font-bold uppercase mt-1 ${item.banned ? 'text-rose-400' : 'text-[#00e5ff]'}">
+                        ${item.banned ? 'BANNED' : 'BAN'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderInlineReporterForm() {
+            const container = document.getElementById('reporter-players-rows');
+            if (!container || !activeMatch) return;
+
+            const allPlayers = [
+                ...(activeMatch.alpha || []).map(p => ({ ...p, team: 'alpha' })),
+                ...(activeMatch.bravo || []).map(p => ({ ...p, team: 'bravo' }))
+            ];
+
+            container.innerHTML = allPlayers.map(p => {
+                const defaultSign = p.team === 'alpha' ? 'plus' : 'minus';
+                return `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-[#07090e] border border-[#1e283c]" data-reporter-uid="${p.uid}" data-reporter-team="${p.team}">
+                        <div class="min-w-0">
+                            <div class="text-xs sm:text-sm font-bold text-white truncate">
+                                ${p.nick} <span class="text-[10px] uppercase text-[#8899b5]">(${p.team})</span>
+                                ${p.uid === player.uid ? `<span class="text-[10px] font-bold text-[#ffb800] ml-1">${t('youTag')}</span>` : ''}
+                            </div>
+                            <div class="font-mono-code text-[11px] text-[#8899b5]">Current: ${p.elo || 0} ELO</div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <label class="text-[10px] font-bold text-[#8899b5]">K/D</label>
+                            <input type="number" step="0.01" min="0" max="20" value="1.15" class="input-faceit font-mono-code text-xs w-20 py-1.5 px-2 rep-kd-input">
+                            <select class="input-faceit font-mono-code text-xs w-20 py-1.5 px-2 rep-sign-input">
+                                <option value="plus" ${defaultSign === 'plus' ? 'selected' : ''}>+ ELO</option>
+                                <option value="minus" ${defaultSign === 'minus' ? 'selected' : ''}>- ELO</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function calculateSystemEloDelta(currentElo, signChoice, isWinnerTeam, kdValue) {
+            const safeElo = Math.max(0, Number(currentElo || 0));
+            const baseMagnitude = isWinnerTeam ? 25 : (safeElo > 1200 ? 32 : 24);
+            const kdBonus = kdValue >= 1.5 ? 3 : (kdValue < 0.7 ? -2 : 0);
+            const magnitude = Math.max(10, baseMagnitude + kdBonus);
+            return signChoice === 'minus' ? -magnitude : magnitude;
+        }
+
+        async function applyCalculatedMatchResults(scoreA, scoreB, winnerTeam, playerEntriesMap) {
+            if (!activeMatch) return;
+
+            const updatedAlpha = (activeMatch.alpha || []).map(p => {
+                const entry = playerEntriesMap[p.uid] || { kd: 0, sign: winnerTeam === 'alpha' ? 'plus' : 'minus' };
+                const isWinner = winnerTeam === 'alpha';
+                const delta = calculateSystemEloDelta(p.elo, entry.sign, isWinner, entry.kd);
+                const nextElo = Math.max(0, Number(p.elo || 0) + delta);
+                return {
+                    ...p,
+                    elo: nextElo,
+                    deltaElo: delta,
+                    kd: Number(entry.kd.toFixed(2)),
+                    won: isWinner
+                };
+            });
+
+            const updatedBravo = (activeMatch.bravo || []).map(p => {
+                const entry = playerEntriesMap[p.uid] || { kd: 0, sign: winnerTeam === 'bravo' ? 'plus' : 'minus' };
+                const isWinner = winnerTeam === 'bravo';
+                const delta = calculateSystemEloDelta(p.elo, entry.sign, isWinner, entry.kd);
+                const nextElo = Math.max(0, Number(p.elo || 0) + delta);
+                return {
+                    ...p,
+                    elo: nextElo,
+                    deltaElo: delta,
+                    kd: Number(entry.kd.toFixed(2)),
+                    won: isWinner
+                };
+            });
+
+            const combinedUpdated = [...updatedAlpha, ...updatedBravo];
+            const myMatchRow = combinedUpdated.find(p => p.uid === player.uid);
+
+            if (myMatchRow) {
+                const prevMatches = Math.max(0, Number(player.matches || 0));
+                const nextMatches = prevMatches + 1;
+                player.elo = myMatchRow.elo;
+                player.matches = nextMatches;
+                if (myMatchRow.won) {
+                    player.wins = Number(player.wins || 0) + 1;
+                } else {
+                    player.losses = Number(player.losses || 0) + 1;
+                }
+                player.kd = Number((((Number(player.kd || 0) * prevMatches) + myMatchRow.kd) / nextMatches).toFixed(2));
+                savePlayerLocal();
+                await syncPlayerFirestore();
+                updatePlayHubCards();
+                renderProfileView();
+                loadTop100Ladder();
+            }
+
+            activeMatch.alpha = updatedAlpha;
+            activeMatch.bravo = updatedBravo;
+            activeMatch.stage = 'finished';
+            activeMatch.finalScore = { alpha: scoreA, bravo: scoreB, winner: winnerTeam };
+
+            if (db && firestoreAvailable) {
+                try {
+                    await db.collection('matches').doc(activeMatch.id).set({
+                        alpha: updatedAlpha,
+                        bravo: updatedBravo,
+                        stage: 'finished',
+                        finalScore: { alpha: scoreA, bravo: scoreB, winner: winnerTeam },
+                        reportedBy: player.uid,
+                        reportedAt: Date.now()
+                    }, { merge: true });
+
+                    await Promise.all(
+                        combinedUpdated.map(p => {
+                            if (!p.uid || p.uid.startsWith('sr_mate_')) return Promise.resolve();
+                            const winInc = p.won ? 1 : 0;
+                            const lossInc = p.won ? 0 : 1;
+                            return db.collection('users').doc(p.uid).set({
+                                elo: p.elo,
+                                matches: firebase.firestore.FieldValue.increment(1),
+                                wins: firebase.firestore.FieldValue.increment(winInc),
+                                losses: firebase.firestore.FieldValue.increment(lossInc),
+                                kd: p.kd,
+                                updatedAt: Date.now()
+                            }, { merge: true }).catch(() => {});
+                        })
+                    );
+                } catch (e) {}
+            }
+
+            document.getElementById('match-stage-veto').classList.add('hidden');
+            document.getElementById('match-stage-lobby').classList.add('hidden');
+            document.getElementById('match-stage-result').classList.remove('hidden');
+            document.getElementById('match-stage-badge').textContent = 'FINISHED';
+            renderCompletedScoreboard();
+
+            const myDelta = myMatchRow ? myMatchRow.deltaElo : 0;
+            const formattedDelta = myDelta > 0 ? `+${myDelta}` : `${myDelta}`;
+            showToast(t(myMatchRow && myMatchRow.won ? 'winToast' : 'lossToast', { delta: formattedDelta }));
+        }
+
+        function renderCompletedScoreboard() {
+            if (!activeMatch || !activeMatch.finalScore) return;
+            const { alpha: scoreA, bravo: scoreB } = activeMatch.finalScore;
+            document.getElementById('result-score-display').textContent = `${scoreA} : ${scoreB}`;
+
+            const roster = [...(activeMatch.alpha || []), ...(activeMatch.bravo || [])];
+            const selfRow = roster.find(p => p.uid === player.uid);
+            const selfDelta = selfRow ? Number(selfRow.deltaElo || 0) : 0;
+            const formattedSelfDelta = selfDelta > 0 ? `+${selfDelta}` : `${selfDelta}`;
+
+            document.getElementById('result-elo-change').textContent = `${player.elo} ELO (${formattedSelfDelta})`;
+            document.getElementById('result-reporter-meta').textContent = `Match ID: ${activeMatch.id} • Reporter: ${activeMatch.reporterNick || activeMatch.hostNick}`;
+
+            document.getElementById('result-scoreboard-tbody').innerHTML = roster.map(p => {
+                const dVal = Number(p.deltaElo || 0);
+                const dStr = dVal > 0 ? `+${dVal}` : `${dVal}`;
+                const isSelfRow = p.uid === player.uid;
+                return `
+                    <tr class="border-b border-[#1e283c]">
+                        <td class="py-2.5 px-2 font-bold ${isSelfRow ? 'text-[#ffb800]' : 'text-white'}">${p.nick}</td>
+                        <td class="py-2.5 px-2 text-center font-mono-code text-[#00e676]">${Number(p.kd || 0).toFixed(2)}</td>
+                        <td class="py-2.5 px-2 text-center font-mono-code font-bold ${dVal >= 0 ? 'text-[#00e676]' : 'text-rose-400'}">${dStr}</td>
+                        <td class="py-2.5 px-2 text-right font-mono-code font-bold text-[#ff4655]">${p.elo}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        async function submitReporterMatchData() {
+            if (!activeMatch || activeMatch.reporterUid !== player.uid) {
+                showToast(t('reporterOnlyAlert'));
+                return;
+            }
+
+            const scoreA = parseInt(document.getElementById('score-alpha-input').value, 10);
+            const scoreB = parseInt(document.getElementById('score-bravo-input').value, 10);
+            const winnerTeam = document.getElementById('reporter-winner-select').value;
+
+            if (scoreA === scoreB || (winnerTeam === 'alpha' && scoreA <= scoreB) || (winnerTeam === 'bravo' && scoreB <= scoreA)) {
+                showToast(t('noDraws'));
+                return;
+            }
+
+            const playerEntriesMap = {};
+            document.querySelectorAll('#reporter-players-rows [data-reporter-uid]').forEach(row => {
+                const uid = row.getAttribute('data-reporter-uid');
+                const team = row.getAttribute('data-reporter-team');
+                const kdVal = Math.max(0, parseFloat(row.querySelector('.rep-kd-input').value) || 0);
+                const signVal = row.querySelector('.rep-sign-input').value || (team === winnerTeam ? 'plus' : 'minus');
+                playerEntriesMap[uid] = { kd: kdVal, sign: signVal };
+            });
+
+            await applyCalculatedMatchResults(scoreA, scoreB, winnerTeam, playerEntriesMap);
+        }
+
+        function openResultModal() {
+            if (!activeMatch || activeMatch.reporterUid !== player.uid) {
+                showToast(t('reporterOnlyAlert'));
+                return;
+            }
+
+            const modalRosterBox = document.getElementById('modal-reporter-roster-inputs');
+            const allPlayers = [
+                ...(activeMatch.alpha || []).map(p => ({ ...p, team: 'alpha' })),
+                ...(activeMatch.bravo || []).map(p => ({ ...p, team: 'bravo' }))
+            ];
+
+            modalRosterBox.innerHTML = allPlayers.map(p => `
+                <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-[#07090e] border border-[#1e283c]" data-modal-uid="${p.uid}" data-modal-team="${p.team}">
+                    <span class="text-xs font-bold text-white truncate">${p.nick} <span class="text-[10px] text-[#8899b5]">(${p.team})</span></span>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                        <input type="number" step="0.01" min="0" max="20" value="1.10" class="input-faceit font-mono-code text-xs w-16 py-1 px-1.5 modal-kd-input">
+                        <select class="input-faceit font-mono-code text-xs w-16 py-1 px-1 modal-sign-input">
+                            <option value="plus" ${p.team === 'alpha' ? 'selected' : ''}>+ELO</option>
+                            <option value="minus" ${p.team === 'bravo' ? 'selected' : ''}>-ELO</option>
+                        </select>
+                    </div>
+                </div>
+            `).join('');
+
+            const modal = document.getElementById('modal-result');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeResultModal() {
+            const modal = document.getElementById('modal-result');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function submitMatchScore(e) {
+            e.preventDefault();
+            if (!activeMatch || activeMatch.reporterUid !== player.uid) {
+                showToast(t('reporterOnlyAlert'));
+                return;
+            }
+
+            const scoreA = parseInt(document.getElementById('score-alpha-input').value, 10);
+            const scoreB = parseInt(document.getElementById('score-bravo-input').value, 10);
+
+            if (scoreA === scoreB) {
+                showToast(t('noDraws'));
+                return;
+            }
+
+            const winnerTeam = scoreA > scoreB ? 'alpha' : 'bravo';
+            const playerEntriesMap = {};
+            document.querySelectorAll('#modal-reporter-roster-inputs [data-modal-uid]').forEach(row => {
+                const uid = row.getAttribute('data-modal-uid');
+                const team = row.getAttribute('data-modal-team');
+                const kdVal = Math.max(0, parseFloat(row.querySelector('.modal-kd-input').value) || 0);
+                const signVal = row.querySelector('.modal-sign-input').value || (team === winnerTeam ? 'plus' : 'minus');
+                playerEntriesMap[uid] = { kd: kdVal, sign: signVal };
+            });
+
+            closeResultModal();
+            await applyCalculatedMatchResults(scoreA, scoreB, winnerTeam, playerEntriesMap);
+        }
+
+        function openSupportDisputeModal() {
+            const matchIdVal = activeMatch ? activeMatch.id : (currentMatchId || 'UNKNOWN');
+            document.getElementById('support-match-id-input').value = matchIdVal;
+            document.getElementById('support-reason-input').value = '';
+            const modal = document.getElementById('modal-support');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeSupportDisputeModal() {
+            const modal = document.getElementById('modal-support');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        async function submitSupportDispute(e) {
+            e.preventDefault();
+            const matchIdVal = document.getElementById('support-match-id-input').value.trim();
+            const reasonVal = document.getElementById('support-reason-input').value.trim();
+            if (!reasonVal) return;
+
+            const badReporterUid = activeMatch ? activeMatch.reporterUid : null;
+            const badReporterNick = activeMatch ? activeMatch.reporterNick : null;
+
+            if (db && firestoreAvailable) {
+                try {
+                    await db.collection('support_reports').add({
+                        matchId: matchIdVal,
+                        reportedByUid: player.uid,
+                        reportedByNick: player.nick || 'Player',
+                        targetReporterUid: badReporterUid,
+                        targetReporterNick: badReporterNick,
+                        reason: reasonVal,
+                        createdAt: Date.now(),
+                        status: 'open'
+                    });
+
+                    if (activeMatch && badReporterUid) {
+                        const dismissedList = Array.from(new Set([...(activeMatch.dismissedReporters || []), badReporterUid]));
+                        const candidates = [...(activeMatch.alpha || []), ...(activeMatch.bravo || [])]
+                            .filter(p => !dismissedList.includes(p.uid));
+
+                        if (candidates.length > 0) {
+                            const nextReporter = candidates[Math.floor(Math.random() * candidates.length)];
+                            activeMatch.reporterUid = nextReporter.uid;
+                            activeMatch.reporterNick = nextReporter.nick;
+                            activeMatch.dismissedReporters = dismissedList;
+                            activeMatch.stage = 'lobby';
+                            delete activeMatch.finalScore;
+
+                            await db.collection('matches').doc(activeMatch.id).set({
+                                reporterUid: nextReporter.uid,
+                                reporterNick: nextReporter.nick,
+                                dismissedReporters: dismissedList,
+                                stage: 'lobby',
+                                finalScore: firebase.firestore.FieldValue.delete()
+                            }, { merge: true });
+                        }
+                    }
+                } catch (err) {}
+            }
+
+            closeSupportDisputeModal();
+            renderMatchRoom();
+            showToast(t('supportSent'));
+        }
+
+        async function userBanItem(itemName) {
+            if (!activeMatch || activeMatch.stage !== 'veto') return;
+            const capAlpha = activeMatch.alpha.find(p => p.isCaptain) || activeMatch.alpha[0];
+            const capBravo = activeMatch.bravo.find(p => p.isCaptain) || activeMatch.bravo[0];
+
+            const isAlphaTurnCap = activeMatch.vetoTurn === 'A' && capAlpha && capAlpha.uid === player.uid;
+            const isBravoTurnCap = activeMatch.vetoTurn === 'B' && capBravo && capBravo.uid === player.uid;
+            if (!isAlphaTurnCap && !isBravoTurnCap) return;
+
+            const target = activeMatch.items.find(i => i.name === itemName);
+            if (!target || target.banned) return;
+
+            target.banned = true;
+            activeMatch.vetoTurn = activeMatch.vetoTurn === 'A' ? 'B' : 'A';
+            await persistMatchVetoState();
+            renderMatchRoom();
+        }
+
+        async function autoFinishVeto() {
+            if (!activeMatch || activeMatch.stage !== 'veto') return;
+            const capAlpha = activeMatch.alpha.find(p => p.isCaptain) || activeMatch.alpha[0];
+            const capBravo = activeMatch.bravo.find(p => p.isCaptain) || activeMatch.bravo[0];
+
+            const isAlphaTurnCap = activeMatch.vetoTurn === 'A' && capAlpha && capAlpha.uid === player.uid;
+            const isBravoTurnCap = activeMatch.vetoTurn === 'B' && capBravo && capBravo.uid === player.uid;
+            if (!isAlphaTurnCap && !isBravoTurnCap) return;
+
+            const avail = activeMatch.items.filter(i => !i.banned);
+            if (avail.length <= 1) return;
+            const pick = avail[Math.floor(Math.random() * avail.length)];
+            pick.banned = true;
+            activeMatch.vetoTurn = activeMatch.vetoTurn === 'A' ? 'B' : 'A';
+            await persistMatchVetoState();
+            renderMatchRoom();
+        }
+
+        async function persistMatchVetoState() {
+            if (!db || !firestoreAvailable || !activeMatch) return;
+            try {
+                await db.collection('matches').doc(activeMatch.id).set({
+                    vetoTurn: activeMatch.vetoTurn,
+                    stage: activeMatch.stage,
+                    items: activeMatch.items,
+                    chosenMap: activeMatch.chosenMap
+                }, { merge: true });
+            } catch (e) {}
+        }
+
+        function copyPlayerId(val, btnEl) {
+            try {
+                const temp = document.createElement('textarea');
+                temp.value = val;
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+            } catch (e) {}
+            if (btnEl) {
+                const orig = btnEl.textContent;
+                btnEl.textContent = '✓';
+                setTimeout(() => { btnEl.textContent = orig; }, 1400);
+            }
+            showToast(t('copied'));
+        }
+
+        function leaveMatchToPlay() {
+            if (currentMatchUnsub) {
+                currentMatchUnsub();
+                currentMatchUnsub = null;
+            }
+            currentMatchId = null;
+            activeMatch = null;
+            pendingReadyMatch = null;
+            const retBtn = document.getElementById('hdr-match-return-btn');
+            retBtn.classList.add('hidden');
+            retBtn.classList.remove('inline-flex');
+            switchView('play');
+        }
+
+        // Leaderboard (Podium + #4-100 rows, no prize pools, composite-index free)
+        function setLadderFilter(filterName) {
+            ladderFilter = filterName;
+            ['DEFAULT', 'QUAL', 'PRO', 'CLANS'].forEach(f => {
+                const el = document.getElementById('ltab-' + f);
+                if (el) el.classList.toggle('active', f === filterName);
+            });
+            renderLadderFromEntries(cachedLadderEntries);
+        }
+
+        function renderAvatarBox(u, sizeClass = 'w-11 h-11') {
+            const letter = (u.nick || 'P')[0].toUpperCase();
+            if (u.avatar) {
+                return `<div class="${sizeClass} rounded-2xl overflow-hidden border border-[#2d3854] mx-auto shrink-0"><img src="${u.avatar}" alt="${u.nick}" class="w-full h-full object-cover"></div>`;
+            }
+            return `<div class="${sizeClass} rounded-2xl bg-gradient-to-br from-[#1b2236] to-[#111524] border border-[#2d3854] flex items-center justify-center font-cyber text-sm font-black text-[#e2e8f0] mx-auto shrink-0">${letter}</div>`;
+        }
+
+        async function loadTop100Ladder(manualRefresh = false) {
+            if (db && firestoreAvailable) {
+                try {
+                    const snap = await db.collection('users').get();
+                    const entries = [];
+                    snap.forEach(doc => {
+                        const d = doc.data();
+                        if (d && d.uid) entries.push(d);
+                    });
+                    cachedLadderEntries = entries;
+                } catch (e) {
+                    console.warn("Manual ladder fetch error:", e);
+                }
+            }
+            renderLadderFromEntries(cachedLadderEntries);
+            if (manualRefresh) {
+                showToast(t('ladderRefreshed'));
+            }
+        }
+
+        function renderLadderFromEntries(allUsers) {
+            const podiumGrid = document.getElementById('ladder-podium-grid');
+            const rowsList = document.getElementById('ladder-rows-list');
+            const formatText = player.game === 'Standrise' ? '5v5' : '3v3';
+            document.getElementById('ladder-discipline-label').textContent = `${player.game} (${formatText}) • ${ladderFilter}`;
+
+            let entries = (allUsers || []).filter(u => !u.game || u.game === player.game);
+
+            const selfEntry = {
+                ...player,
+                nick: (player.nick || '').trim() || `Player_${player.srRisingId.slice(-4)}`
+            };
+
+            const existingSelfIdx = entries.findIndex(u => u.uid === player.uid);
+            if (existingSelfIdx >= 0) {
+                entries[existingSelfIdx] = { ...entries[existingSelfIdx], ...selfEntry };
+            } else {
+                entries.push(selfEntry);
+            }
+
+            entries.sort((a, b) => {
+                const eloDiff = Number(b.elo || 0) - Number(a.elo || 0);
+                if (eloDiff !== 0) return eloDiff;
+                return Number(a.updatedAt || 0) - Number(b.updatedAt || 0);
+            });
+
+            const top100 = entries.slice(0, 100);
+
+            const myRankIndex = top100.findIndex(u => u.uid === player.uid);
+            const rankEl = document.getElementById('play-stat-rank');
+            if (rankEl) {
+                rankEl.textContent = myRankIndex >= 0 ? `#${myRankIndex + 1}` : '#—';
+            }
+
+            if (top100.length === 0) {
+                podiumGrid.innerHTML = '';
+                rowsList.innerHTML = `
+                    <div class="faceit-card p-6 text-center text-xs text-[#8899b5]">
+                        ${player.lang === 'en' ? 'No ranked players yet — set your Nickname & ID to appear on the board!' : 'Рейтинг пока пуст — укажите Никнейм и ID, чтобы появиться в списке!'}
+                    </div>
+                `;
+                return;
+            }
+
+            const p1 = top100[0] || null;
+            const p2 = top100[1] || null;
+            const p3 = top100[2] || null;
+
+            const renderPodiumSlot = (u, rankNum, isFirst) => {
+                if (!u) {
+                    return `
+                        <div class="podium-card opacity-40 ${isFirst ? 'first -mt-3' : ''}">
+                            ${isFirst ? `<div class="text-[#ffd56b] text-xs mb-1"><i class="fa-solid fa-crown"></i></div>` : ''}
+                            <div class="w-11 h-11 rounded-2xl bg-[#141928] border border-dashed border-[#2b3552] mx-auto mb-2 flex items-center justify-center text-[#586882]">—</div>
+                            <div class="text-xs font-bold text-[#64748b]">#${rankNum}</div>
+                            <div class="font-mono-code text-[11px] text-[#586882] mt-0.5">0 ELO</div>
+                            <div class="podium-rank-pill">${rankNum}</div>
+                        </div>
+                    `;
+                }
+                const eloVal = Number(u.elo || 0);
+                const nickColor = rankNum === 1 ? 'text-[#38bdf8]' : rankNum === 2 ? 'text-[#60a5fa]' : 'text-[#f87171]';
+                return `
+                    <div class="podium-card ${isFirst ? 'first -mt-4' : ''}">
+                        ${isFirst ? `<div class="text-[#ffd56b] text-sm mb-1 drop-shadow-[0_0_8px_rgba(255,213,107,0.6)]"><i class="fa-solid fa-crown"></i></div>` : ''}
+                        <div class="mb-2">${renderAvatarBox(u, isFirst ? 'w-14 h-14' : 'w-11 h-11')}</div>
+                        <div class="text-xs font-extrabold ${nickColor} truncate">${u.nick || 'Player'}</div>
+                        ${u.srRisingId ? `<div class="font-mono-code text-[9px] text-[#7c8aa6]">SR ${u.srRisingId}</div>` : ''}
+                        <div class="font-mono-code text-[11px] font-bold text-[#cbd5e1] mt-0.5">
+                            <i class="fa-solid fa-bolt text-[9px] text-[#ffb800] mr-0.5"></i>${eloVal}
+                        </div>
+                        <div class="podium-rank-pill">${rankNum}</div>
+                    </div>
+                `;
+            };
+
+            podiumGrid.innerHTML = [
+                renderPodiumSlot(p2, 2, false),
+                renderPodiumSlot(p1, 1, true),
+                renderPodiumSlot(p3, 3, false)
+            ].join('');
+
+            const rest = top100.slice(3);
+            if (rest.length === 0) {
+                rowsList.innerHTML = `
+                    <div class="text-center py-4 text-xs text-[#7c8aa6]">
+                        ${player.lang === 'en' ? 'More players needed for #4+' : 'Ожидаем больше игроков для позиций #4+'}
+                    </div>
+                `;
+                return;
+            }
+
+            rowsList.innerHTML = rest.map((u, idx) => {
+                const rank = idx + 4;
+                const eloVal = Number(u.elo || 0);
+                const lvl = computeSkillLevel(eloVal);
+                const isSelfRow = u.uid === player.uid;
+
+                return `
+                    <div class="ladder-row-card ${isSelfRow ? 'self-row' : ''}">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <span class="font-mono-code text-xs font-bold text-[#7c8aa6] w-6 text-center shrink-0">${rank}</span>
+                            ${renderAvatarBox(u, 'w-9 h-9')}
+                            <div class="min-w-0">
+                                <div class="text-xs sm:text-sm font-bold text-white truncate">
+                                    ${u.nick || 'Player'}
+                                    ${isSelfRow ? `<span class="ml-1 text-[10px] font-extrabold text-[#ff4655]">${t('youTag')}</span>` : ''}
+                                </div>
+                                ${u.srRisingId ? `<div class="font-mono-code text-[10px] text-[#7c8aa6]">SR ID: ${u.srRisingId}</div>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2.5 shrink-0">
+                            <span class="lvl-badge lvl-${lvl}">${lvl}</span>
+                            <span class="font-mono-code text-xs sm:text-sm font-extrabold text-[#ff4655] min-w-[46px] text-right">${eloVal}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Profile view & avatar upload
+        function handleAvatarFile(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = async ev => {
+                player.avatar = ev.target.result;
+                savePlayerLocal();
+                await syncPlayerFirestore();
+                renderProfileView();
+                renderPartySlots();
+                loadTop100Ladder();
+                showToast(t('avatarUpdated'));
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderProfileView() {
+            const eloVal = Math.max(0, Number(player.elo || 0));
+            const matchesVal = Math.max(0, Number(player.matches || 0));
+            const winsVal = Math.max(0, Number(player.wins || 0));
+            const kdVal = Math.max(0, Number(player.kd || 0));
+            const wr = matchesVal > 0 ? ((winsVal / matchesVal) * 100).toFixed(1) : '0.0';
+            const lvl = computeSkillLevel(eloVal);
+
+            document.getElementById('profile-nick-display').textContent = player.nick || `Player_${player.srRisingId.slice(-4)}`;
+            document.getElementById('profile-tag-display').textContent = player.uidtag || '000000';
+            document.getElementById('profile-sr-rising-id').textContent = player.srRisingId;
+            document.getElementById('profile-game-badge').textContent = player.game;
+            document.getElementById('profile-lang-badge').textContent = (player.lang || 'ru').toUpperCase();
+
+            const badge = document.getElementById('profile-lvl-badge');
+            badge.textContent = lvl;
+            badge.className = `lvl-badge lvl-${lvl}`;
+
+            document.getElementById('profile-stat-elo').textContent = eloVal;
+            document.getElementById('profile-stat-wr').textContent = `${wr}%`;
+            document.getElementById('profile-stat-kd').textContent = kdVal.toFixed(2);
+            document.getElementById('profile-stat-matches').textContent = matchesVal;
+
+            const letterEl = document.getElementById('profile-avatar-letter');
+            const imgEl = document.getElementById('profile-avatar-img');
+            letterEl.textContent = player.nick ? player.nick[0].toUpperCase() : 'P';
+
+            if (player.avatar) {
+                imgEl.src = player.avatar;
+                imgEl.classList.remove('hidden');
+                letterEl.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                letterEl.classList.remove('hidden');
+            }
+        }
+
+        // Boot initialization
+        (function init() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    player = { ...player, ...parsed };
+                    if (!player.srRisingId || !/^\d{6}$/.test(String(player.srRisingId))) {
+                        player.srRisingId = generateNumericSrRisingId();
+                    }
+                    if (typeof player.kd !== 'number' || isNaN(player.kd)) {
+                        player.kd = 0.00;
+                    }
+                    savePlayerLocal();
+                    pendingLang = player.lang || 'ru';
+                    pendingGame = player.game || 'Standrise';
+
+                    document.getElementById('onboarding-lang').classList.add('hidden');
+                    document.getElementById('onboarding-game').classList.add('hidden');
+                    launchApp();
+                    return;
+                }
+            } catch (e) {
+                console.warn("Storage restore failed:", e);
+            }
+
+            chooseOnboardingLang('ru');
+            chooseOnboardingGame('Standrise');
+        })();
+    </script>
+</body>
+</html>
